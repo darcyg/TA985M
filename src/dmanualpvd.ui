@@ -1,0 +1,345 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dManualPVD</class>
+ <widget class="QDialog" name="dManualPVD">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>652</width>
+    <height>542</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Ручное управление имитатором ПВД</string>
+  </property>
+  <widget class="QGroupBox" name="groupBox">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>30</y>
+     <width>151</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Включение опроса</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>0</x>
+      <y>20</y>
+      <width>151</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <item>
+      <widget class="QCheckBox" name="cbBD_A_On">
+       <property name="text">
+        <string>Включить БД-А</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbBD_B_On">
+       <property name="text">
+        <string>Включить БД-Б</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbBD_V_On">
+       <property name="text">
+        <string>Включить БД-В</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbBD_G_On">
+       <property name="text">
+        <string>Включить БД-Г</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="cbBD_D_On">
+       <property name="text">
+        <string>Включить БД-Д</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>190</x>
+     <y>30</y>
+     <width>451</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Режим работы</string>
+   </property>
+   <widget class="QComboBox" name="cbStatus">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>40</y>
+      <width>179</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Выключено</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Работа</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Тест BRAM</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Самоконтроль</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget_2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>80</y>
+      <width>431</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <item>
+      <widget class="QRadioButton" name="rbPVD_Osn">
+       <property name="text">
+        <string>Основной ПВД</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbPVD_Res">
+       <property name="text">
+        <string>Резервный ПВД</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>200</y>
+     <width>631</width>
+     <height>331</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Данные БД</string>
+   </property>
+   <widget class="QTableView" name="tbBD">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>90</y>
+      <width>611</width>
+      <height>231</height>
+     </rect>
+    </property>
+    <property name="editTriggers">
+     <set>QAbstractItemView::NoEditTriggers</set>
+    </property>
+    <property name="selectionMode">
+     <enum>QAbstractItemView::SingleSelection</enum>
+    </property>
+    <attribute name="horizontalHeaderDefaultSectionSize">
+     <number>36</number>
+    </attribute>
+    <attribute name="horizontalHeaderMinimumSectionSize">
+     <number>36</number>
+    </attribute>
+    <attribute name="verticalHeaderDefaultSectionSize">
+     <number>25</number>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="horizontalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>611</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="label_3">
+       <property name="text">
+        <string>Канал БД:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbReadBD">
+       <item>
+        <property name="text">
+         <string>БД-А</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>БД-Б</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>БД-В</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>БД-Г</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>БД-Д</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Канал ЛК:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbReadLK">
+       <item>
+        <property name="text">
+         <string>ЛК1</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ЛК2</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ЛК3</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>ЛК4</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_2">
+       <property name="text">
+        <string>Режим чтения:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cbReadRegim">
+       <item>
+        <property name="text">
+         <string>Весь ЛК</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>1 СИТ</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>2 СИТ</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>3 СИТ</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pbRead">
+       <property name="text">
+        <string>Прочитать</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
