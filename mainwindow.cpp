@@ -40,45 +40,45 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
     qDebug() << "Mss modbus addr: " << currMSSAddr;
 
 
-    for (int i = 0; i < 4; i++)
-        mb_data[i] = 0;
-
     // Выключаем все МСС
 
     MBResult = 255;
 
     MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_ONOFF_ADDR, 4, mb_data);
 
-    while(MBResult == 255)
-    {
-        QApplication::processEvents();
-    }
-
-    if (MBResult)
-    {
-        QMessageBox::critical(this, tr("Ошибка ТК168"), tr("Ошибка обмена ModBus"), QMessageBox::Ok);
-        return;
-    }
+    WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
 
     // Загружаем МСС1
     if (regim1) {
         mss_file -> setFileName(mssfilePath + MSSFileName[regim1]);
 
-       // mss_file -> setFileName("test.mss");
+
 
         qDebug() << "Load file to MSS1: " << mss_file -> fileName();
 
         mss_file -> open(QIODevice::ReadOnly);
         mbMSSAdrr = MSS_CHANAL1_ADDR;
 
+        MBResult = 255;
+
         mb_data[0] = 0; mb_data[1] = 0;
         MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_CHANAL_ADDR, 2, mb_data);
+
+        WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
+
 
         while (!mss_file -> atEnd())
         {
             readNum = mss_file -> read((char *)mb_data, MSS_BLOCK_WRITE);
+
+            MBResult = 255;
+
             MBTcp -> WriteMultipleHoldingRegisters(currMSSAddr, mbMSSAdrr, readNum/2, dataTowrite);
+
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
             mbMSSAdrr = mbMSSAdrr + readNum/2;
         }
 

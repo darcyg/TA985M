@@ -23,6 +23,7 @@
 
 #include "src/ta985m.h"
 
+
 static const char * msgType[] =
 {
     "(II) ", // Info
@@ -32,6 +33,13 @@ static const char * msgType[] =
 
 };
 
+
+#define WAIT_FOR_MODBUS_TRANSMIT(X) while(X) {QApplication::processEvents();} \
+    if (MBResult)                                                                                        \
+    {                                                                                                    \
+        QMessageBox::critical(this, tr("Ошибка ТК168"), tr("Ошибка обмена ModBus"), QMessageBox::Ok);   \
+        return;                                                                                          \
+    }
 
 #define setCurrentRegimMSS1BDG(X) currentRegim[0][3] = X
 #define setCurrentRegimMSS2BDG(X) currentRegim[1][3] = X
