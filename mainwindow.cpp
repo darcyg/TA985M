@@ -96,14 +96,23 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
         mss_file -> open(QIODevice::ReadOnly);
         mbMSSAdrr = MSS_CHANAL2_ADDR;
 
+        MBResult = 255;
+
         mb_data[0] = 1; mb_data[1] = 0;
         MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_CHANAL_ADDR, 2, mb_data);
 
+        WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
         while (!mss_file -> atEnd())
         {
             readNum = mss_file -> read((char *)mb_data, MSS_BLOCK_WRITE);
+
+            MBResult = 255;
+
             MBTcp -> WriteMultipleHoldingRegisters(currMSSAddr, mbMSSAdrr, readNum/2, dataTowrite);
+
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
             mbMSSAdrr = mbMSSAdrr + readNum/2;
         }
 
@@ -121,13 +130,23 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
         mss_file -> open(QIODevice::ReadOnly);
         mbMSSAdrr = MSS_CHANAL3_ADDR;
 
+        MBResult = 255;
+
         mb_data[0] = 0; mb_data[1] = 1;
         MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_CHANAL_ADDR, 2, mb_data);
+
+        WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
         while (!mss_file -> atEnd())
         {
             readNum = mss_file -> read((char *)mb_data, MSS_BLOCK_WRITE);
+
+            MBResult = 255;
+
             MBTcp -> WriteMultipleHoldingRegisters(currMSSAddr, mbMSSAdrr, readNum/2, dataTowrite);
+
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
             mbMSSAdrr = mbMSSAdrr + readNum/2;
         }
 
@@ -145,13 +164,24 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
         mss_file -> open(QIODevice::ReadOnly);
         mbMSSAdrr = MSS_CHANAL4_ADDR;
 
+
+        MBResult = 255;
+
         mb_data[0] = 1; mb_data[1] = 1;
         MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_CHANAL_ADDR, 2, mb_data);
+
+        WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
         while (!mss_file -> atEnd())
         {
             readNum = mss_file -> read((char *)mb_data, MSS_BLOCK_WRITE);
+
+            MBResult = 255;
+
             MBTcp -> WriteMultipleHoldingRegisters(currMSSAddr, mbMSSAdrr, readNum/2, dataTowrite);
+
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
             mbMSSAdrr = mbMSSAdrr + readNum/2;
         }
 
@@ -164,8 +194,13 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
     mb_data[0] = regim1;
    // mb_data[1] = 0; mb_data[2] = 0; mb_data[3] = 0;
 
+
+    MBResult = 255;
+
     mb_data[1] = regim2; mb_data[2] = regim3; mb_data[3] = regim4;
     MBTcp -> WriteMultipleCoils(currMSSAddr, MSS_ONOFF_ADDR, 4, mb_data);
+
+    WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
     delete mss_file;
 
@@ -192,11 +227,23 @@ void MainWindow::ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS
 
     {
         if (regimeMSS1)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKG_1, regimeMSS1);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS2)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKG_2, regimeMSS2);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS3)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKG_3, regimeMSS3);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS4)
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKG_4, regimeMSS4);
     } else // Изменяем БД-Д
@@ -241,18 +288,18 @@ bool MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
     {
         Addr = num_bd * 128 + num_mss * MSS_BUFF_SIZE_WORD + i * MSS_READ_BUFF_SIZE;
 
-        // TODO Переделать под сигналы ошибок !!!!!!!!!!!!!!!!!!!1
 
-//        if (MBTcp -> ReadInputRegisters(PVD_ADDR, Addr, MSS_READ_BUFF_SIZE, read_data))
-//        {
-//            for (int j = 0; j < MSS_READ_BUFF_SIZE; j++)
-//            {
-//                data_t[i * MSS_READ_BUFF_SIZE + j] = read_data[j];
-//            }
-//        } else
-//        {
-//            return false;
-//        }
+
+        if (MBTcp -> ReadInputRegisters(PVD_ADDR, Addr, MSS_READ_BUFF_SIZE, read_data))
+        {
+            for (int j = 0; j < MSS_READ_BUFF_SIZE; j++)
+            {
+                data_t[i * MSS_READ_BUFF_SIZE + j] = read_data[j];
+            }
+        } else
+        {
+            return false;
+        }
     }
     return true;
 
