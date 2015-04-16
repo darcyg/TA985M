@@ -32,6 +32,8 @@ dManualPVD::dManualPVD(QWidget *parent) :
     connect(cbBD_G_On, SIGNAL(clicked()), this, SLOT(slot_ChangeOnOff()));
     connect(cbBD_D_On, SIGNAL(clicked()), this, SLOT(slot_ChangeOnOff()));
 
+    connect(pbGetTest, SIGNAL(clicked()), this, SLOT(slot_GetTest()));
+
 }
 
 void dManualPVD::slot_ChangeRegime(int reg)
@@ -80,7 +82,7 @@ void dManualPVD::slot_readPVD()
 void dManualPVD::slot_ReceivedMSS(quint8 *data)
 {
 
-    noRead = false;
+
     ReadError = false;
 
 
@@ -88,6 +90,8 @@ void dManualPVD::slot_ReceivedMSS(quint8 *data)
 
     for (int i =0; i < 256; i++)
         bd_data[i] = data[i];
+
+    noRead = false;
 
 }
 
@@ -97,7 +101,30 @@ void dManualPVD::slot_ErrorMSS()
     qDebug() << Q_FUNC_INFO;
 
     noRead = false;
+    ReadError = true;
+
+}
+
+void dManualPVD::slot_ErrorModBus(quint8 err)
+{
+    qDebug() << Q_FUNC_INFO;
+    noRead = false;
+    ReadError = true;
+}
+
+void dManualPVD::slot_TestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, bool PVD_G, bool PVD_D)
+{
+
     ReadError = false;
+
+    TestResult[0] = All;
+    TestResult[1] = PVD_A;
+    TestResult[2] = PVD_B;
+    TestResult[3] = PVD_V;
+    TestResult[4] = PVD_G;
+    TestResult[5] = PVD_D;
+
+    noRead = false;
 
 }
 
@@ -123,5 +150,48 @@ void dManualPVD::slot_ChangeOnOff()
 
 void dManualPVD::slot_ChangeStatus(int status)
 {
-   emit ChangePVDStatus(rbPVD_Osn -> isChecked(), status);
+    emit ChangePVDStatus(rbPVD_Osn -> isChecked(), status);
+}
+
+void dManualPVD::slot_GetTest()
+{
+    if (cbStatus -> currentIndex() != 3)
+    {
+        QMessageBox::warning(this, tr("Внимание"), tr("Не установлен режим самоконтроля"), QMessageBox::Ok);
+        return;
+    }
+
+    noRead = true;
+
+    emit GetTest(rbPVD_Osn -> isChecked());
+
+    while (noRead)
+        QApplication::processEvents();
+
+    if (!ReadError)
+    {
+        qDebug() << "Test read OK";
+
+        if (TestResult[0])
+        {
+            qDebug() << "Test error";
+
+            cbTestA -> setChecked(TestResult[1]);
+            cbTestB -> setChecked(TestResult[2]);
+            cbTestV -> setChecked(TestResult[3]);
+            cbTestG -> setChecked(TestResult[4]);
+            cbTestD -> setChecked(TestResult[5]);
+        } else
+        {
+            qDebug() << "Test OK";
+            cbTestA -> setChecked(true);
+            cbTestB -> setChecked(true);
+            cbTestV -> setChecked(true);
+            cbTestG -> setChecked(true);
+            cbTestD -> setChecked(true);
+        }
+
+
+
+    }
 }

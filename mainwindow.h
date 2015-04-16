@@ -16,6 +16,8 @@
 #include "src/dmanualloadmss.h"
 #include "src/dmssfileset.h"
 
+#include "src/dselftest.h"
+
 
 #include "src/modbustcp.h"
 #include "tk168_config.h"
@@ -64,7 +66,7 @@ protected:
 
 private:
 
-    quint8 MBResult;
+    volatile quint8 MBResult;
 
     quint8 debugLevel;
 
@@ -77,7 +79,7 @@ private:
     void MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 regim3, quint8 regim4);
 
     void ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS2, quint8 regimeMSS3, quint8 regimeMSS4);
-    bool LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss);
+    void LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss);
     bool CheckMSS(quint8 *data, quint8 Regime, quint8 FileMSS);
     void ReadSettings();                // Чтение основных настроек из главного файла
     void WriteSettings();               // Запись основных настроек в главный файл
@@ -108,7 +110,23 @@ private:
 
         quint16 MSS_ADDR[5];
 
+        quint16 MAG_ADDR;
+
     }  Block_Addr;
+
+    struct _SELF_TEST_SETUP{
+
+        bool PVD1;
+        bool PVD2;
+        bool MAG1;
+        bool MAG2;
+        bool MSS1;
+        bool MSS2;
+        bool MSS3;
+        bool MSS4;
+        bool MSS5;
+
+    } SelfTestConfig[2];
 
 
 
@@ -138,6 +156,7 @@ public slots:
     void slotManulMSS();
     void slotSetMSSFileName();
     void slotManualPVD();
+    void slotManualMAG();
 
     void slotSecretMenuView(QPoint pe);
 
@@ -148,6 +167,8 @@ public slots:
     void slotConnect();
     void slotDisConnect();
     void slotReportSlave();
+    void slotSelfTest1();
+    void slotSelfTest2();
 
     void changeBDDLK1(int val);
     void changeBDDLK2(int val);
@@ -166,6 +187,7 @@ public slots:
 
     void slotReadPVD(quint16 numBD, quint16 numMSS);
     void slotOnOffPVD(bool osn, quint8 PVD_A, quint8 PVD_B, quint8 PVD_V, quint8 PVD_G, quint8 PVD_D);
+    void slotGetPVDTestResult(bool osn);
     void slotChangePVDStatus(bool osn, quint8 status);
 
 
@@ -176,7 +198,11 @@ public slots:
 signals:
 
     void MSSData(quint8 *data);
+    void PVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, bool PVD_G, bool PVD_D);
     void ErrorMSSLoad();
+    void ChangePVDStatusOK();
+
+    void ErrorModBus(quint8 err);
 
 };
 

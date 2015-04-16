@@ -8,7 +8,7 @@
 #define ORG_DOMAIN      "http://www.rniikp.ru"
 
 
-#define PVD_ADDR                22
+#define PVD_ADDR                24
 
 
 
@@ -21,6 +21,7 @@
 
 #define PVD_ONOFF_ADDR          0
 #define PVD_REGIME_ADDR         5
+#define PVD_TEST_RESULT_ADDR_ALL 0
 
 #define MSS_CHANAL1_ADDR        0
 #define MSS_CHANAL2_ADDR        0

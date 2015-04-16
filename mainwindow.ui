@@ -912,14 +912,14 @@
      </rect>
     </property>
     <property name="title">
-     <string>GroupBox</string>
+     <string>Управление ТК168</string>
     </property>
     <widget class="QWidget" name="horizontalLayoutWidget_2">
      <property name="geometry">
       <rect>
        <x>9</x>
        <y>30</y>
-       <width>451</width>
+       <width>651</width>
        <height>51</height>
       </rect>
      </property>
@@ -980,7 +980,47 @@
       <item>
        <widget class="QPushButton" name="pbReportSlave">
         <property name="text">
-         <string>Состояние ИП</string>
+         <string>Состояние</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_11">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbSelfTest1">
+        <property name="text">
+         <string>Самоконтроль 1</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_12">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="pbSelfTest2">
+        <property name="text">
+         <string>Самоконтроль 2</string>
         </property>
        </widget>
       </item>

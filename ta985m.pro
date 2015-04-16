@@ -23,7 +23,9 @@ SOURCES += main.cpp\
     src/dmanualloadmss.cpp \
     src/dmssfileset.cpp \
     src/dmanualpvd.cpp \
-    src/dsdatamodel.cpp
+    src/dsdatamodel.cpp \
+    src/dmanuamag.cpp \
+    src/dselftest.cpp
 
 HEADERS  += mainwindow.h \
             src/ta985m.h \
@@ -41,13 +43,17 @@ HEADERS  += mainwindow.h \
     src/dmanualloadmss.h \
     src/dmssfileset.h \
     src/dmanualpvd.h \
-    src/dsdatamodel.h
+    src/dsdatamodel.h \
+    src/dmanuamag.h \
+    src/dselftest.h
 
 FORMS    += mainwindow.ui \
     src/viewbd.ui \
     src/dmanualloadmss.ui \
     src/dmssfileset.ui \
-    src/dmanualpvd.ui
+    src/dmanualpvd.ui \
+    src/dmanuamag.ui \
+    src/dselftest.ui
 
 
 INCLUDEPATH += 3rdparty/libmodbus \

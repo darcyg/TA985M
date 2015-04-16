@@ -245,17 +245,37 @@ void MainWindow::ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS
             WAIT_FOR_MODBUS_TRANSMIT(MBResult)
         }
         if (regimeMSS4)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKG_4, regimeMSS4);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
     } else // Изменяем БД-Д
     {
         if (regimeMSS1)
+         {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKD_1, regimeMSS1);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS2)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKD_2, regimeMSS2);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS3)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKD_3, regimeMSS3);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
         if (regimeMSS4)
+        {
+            MBResult = 255;
             MBTcp -> WriteHoldingRegister(PVD_ADDR, ADDR_REGIM_LKD_4, regimeMSS4);
+            WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+        }
     }
 }
 
@@ -272,7 +292,7 @@ void MainWindow::ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS
  *
  */
 
-bool MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
+void MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
 {
 
 
@@ -289,19 +309,20 @@ bool MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
         Addr = num_bd * 128 + num_mss * MSS_BUFF_SIZE_WORD + i * MSS_READ_BUFF_SIZE;
 
 
+        MBResult = 255;
+        MBTcp -> ReadInputRegisters(PVD_ADDR, Addr, MSS_READ_BUFF_SIZE, read_data);
 
-        if (MBTcp -> ReadInputRegisters(PVD_ADDR, Addr, MSS_READ_BUFF_SIZE, read_data))
+        WAIT_FOR_MODBUS_TRANSMIT(MBResult)
+
+        for (int j = 0; j < MSS_READ_BUFF_SIZE; j++)
         {
-            for (int j = 0; j < MSS_READ_BUFF_SIZE; j++)
-            {
-                data_t[i * MSS_READ_BUFF_SIZE + j] = read_data[j];
-            }
-        } else
-        {
-            return false;
+            data_t[i * MSS_READ_BUFF_SIZE + j] = read_data[j];
         }
+
     }
-    return true;
+
+    MBResult = 0;
+    return;
 
 
 
@@ -343,14 +364,45 @@ void MainWindow::ReadSettings()
 
     setupFile.beginGroup("Blocks_ADDR");
 
-        Block_Addr.PVD1 = setupFile.value("PVD1", 21).toInt();
-        Block_Addr.PVD2 = setupFile.value("PVD2", 22).toInt();
+        Block_Addr.PVD1 = setupFile.value("PVD1", 24).toInt();
+        Block_Addr.PVD2 = setupFile.value("PVD2", 25).toInt();
 
         Block_Addr.MSS_ADDR[0] = setupFile.value("MSS1", 2).toInt();
         Block_Addr.MSS_ADDR[1] = setupFile.value("MSS2", 3).toInt();
         Block_Addr.MSS_ADDR[2] = setupFile.value("MSS3", 4).toInt();
         Block_Addr.MSS_ADDR[3] = setupFile.value("MSS4", 5).toInt();
         Block_Addr.MSS_ADDR[4] = setupFile.value("MSS5", 6).toInt();
+
+        Block_Addr.MAG_ADDR = setupFile.value("MAG", 33).toInt();
+
+    setupFile.endGroup();
+
+
+    setupFile.beginGroup("SelfTest1");
+
+        SelfTestConfig[0].PVD1 = setupFile.value("PVD1", true).toBool();
+        SelfTestConfig[0].PVD2 = setupFile.value("PVD2", true).toBool();
+        SelfTestConfig[0].MAG1 = setupFile.value("MAG1", true).toBool();
+        SelfTestConfig[0].MAG2 = setupFile.value("MAG2", false).toBool();
+        SelfTestConfig[0].MSS1 = setupFile.value("MSS1", true).toBool();
+        SelfTestConfig[0].MSS2 = setupFile.value("MSS2", true).toBool();
+        SelfTestConfig[0].MSS3 = setupFile.value("MSS3", true).toBool();
+        SelfTestConfig[0].MSS4 = setupFile.value("MSS4", true).toBool();
+        SelfTestConfig[0].MSS5 = setupFile.value("MSS5", true).toBool();
+
+    setupFile.endGroup();
+
+    setupFile.beginGroup("SelfTest2");
+
+        SelfTestConfig[1].PVD1 = setupFile.value("PVD1", false).toBool();
+        SelfTestConfig[1].PVD2 = setupFile.value("PVD2", false).toBool();
+        SelfTestConfig[1].MAG1 = setupFile.value("MAG1", false).toBool();
+        SelfTestConfig[1].MAG2 = setupFile.value("MAG2", true).toBool();
+        SelfTestConfig[1].MSS1 = setupFile.value("MSS1", false).toBool();
+        SelfTestConfig[1].MSS2 = setupFile.value("MSS2", false).toBool();
+        SelfTestConfig[1].MSS3 = setupFile.value("MSS3", false).toBool();
+        SelfTestConfig[1].MSS4 = setupFile.value("MSS4", false).toBool();
+        SelfTestConfig[1].MSS5 = setupFile.value("MSS5", false).toBool();
 
     setupFile.endGroup();
 
@@ -396,7 +448,39 @@ void MainWindow::WriteSettings()
         setupFile.setValue("MSS4", Block_Addr.MSS_ADDR[3]);
         setupFile.setValue("MSS5", Block_Addr.MSS_ADDR[4]);
 
+        setupFile.setValue("MAG", Block_Addr.MAG_ADDR);
+
        setupFile.endGroup();
+
+
+       setupFile.beginGroup("SelfTest1");
+
+           setupFile.setValue("PVD1", SelfTestConfig[0].PVD1);
+           setupFile.setValue("PVD2", SelfTestConfig[0].PVD2);
+           setupFile.setValue("MAG1", SelfTestConfig[0].MAG1);
+           setupFile.setValue("MAG2", SelfTestConfig[0].MAG2);
+           setupFile.setValue("MSS1", SelfTestConfig[0].MSS1);
+           setupFile.setValue("MSS2", SelfTestConfig[0].MSS2);
+           setupFile.setValue("MSS3", SelfTestConfig[0].MSS3);
+           setupFile.setValue("MSS4", SelfTestConfig[0].MSS4);
+           setupFile.setValue("MSS5", SelfTestConfig[0].MSS5);
+
+       setupFile.endGroup();
+
+       setupFile.beginGroup("SelfTest2");
+
+           setupFile.setValue("PVD1", SelfTestConfig[1].PVD1);
+           setupFile.setValue("PVD2", SelfTestConfig[1].PVD2);
+           setupFile.setValue("MAG1", SelfTestConfig[1].MAG1);
+           setupFile.setValue("MAG2", SelfTestConfig[1].MAG2);
+           setupFile.setValue("MSS1", SelfTestConfig[1].MSS1);
+           setupFile.setValue("MSS2", SelfTestConfig[1].MSS2);
+           setupFile.setValue("MSS3", SelfTestConfig[1].MSS3);
+           setupFile.setValue("MSS4", SelfTestConfig[1].MSS4);
+           setupFile.setValue("MSS5", SelfTestConfig[1].MSS5);
+
+       setupFile.endGroup();
+
 
        setupFile.beginGroup("ModBus");
 
@@ -541,6 +625,11 @@ MainWindow::MainWindow(QWidget *parent) :
                             SLOT(slotManualPVD()),
                             Qt::CTRL + Qt::Key_3);
 
+    secretMenu -> addAction("Ручное управление МАГ",
+                            this,
+                            SLOT(slotManualMAG()),
+                            Qt::CTRL + Qt::Key_4);
+
 
 
     connect(gbSecret, SIGNAL(customContextMenuRequested(QPoint)),
@@ -555,6 +644,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(pbConnect, SIGNAL(clicked()), this, SLOT(slotConnect()));
     connect(pbDisConnect, SIGNAL(clicked()), this, SLOT(slotDisConnect()));
     connect(pbReportSlave, SIGNAL(clicked()), this, SLOT(slotReportSlave()));
+    connect(pbSelfTest1, SIGNAL(clicked()), this, SLOT(slotSelfTest1()));
+    connect(pbSelfTest2, SIGNAL(clicked()), this, SLOT(slotSelfTest2()));
 
     connect(pbCheckPVD, SIGNAL(clicked()), this, SLOT(slotCheckPVD()));
 
@@ -878,7 +969,17 @@ void MainWindow::slotManualPVD()
     connect(&dialog, SIGNAL(ChangePVDStatus(bool,quint8)),
             this, SLOT(slotChangePVDStatus(bool,quint8)));
 
+    connect(&dialog, SIGNAL(GetTest(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
+            &dialog, SLOT(slot_TestResult(bool,bool,bool,bool,bool,bool)));
+    connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slot_ErrorModBus(quint8)));
+
     dialog.exec();
+
+}
+
+void MainWindow::slotManualMAG()
+{
 
 }
 
@@ -954,6 +1055,51 @@ void MainWindow::slotReportSlave()
         delete st;
       }
    }
+}
+
+void MainWindow::slotSelfTest1()
+{
+    dSelfTest dialog;
+
+    dialog.setPVD1Test(SelfTestConfig[0].PVD1);
+    dialog.setPVD2Test(SelfTestConfig[0].PVD2);
+    dialog.setMAG1Test(SelfTestConfig[0].MAG1);
+    dialog.setMAG2Test(SelfTestConfig[0].MAG2);
+
+    dialog.setMSS1Test(SelfTestConfig[0].MSS1);
+    dialog.setMSS2Test(SelfTestConfig[0].MSS2);
+    dialog.setMSS3Test(SelfTestConfig[0].MSS3);
+    dialog.setMSS4Test(SelfTestConfig[0].MSS4);
+    dialog.setMSS5Test(SelfTestConfig[0].MSS5);
+
+
+    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
+            &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
+
+    dialog.exec();
+}
+
+void MainWindow::slotSelfTest2()
+{
+    dSelfTest dialog;
+
+    dialog.setPVD1Test(SelfTestConfig[1].PVD1);
+    dialog.setPVD2Test(SelfTestConfig[1].PVD2);
+    dialog.setMAG1Test(SelfTestConfig[1].MAG1);
+    dialog.setMAG2Test(SelfTestConfig[1].MAG2);
+
+    dialog.setMSS1Test(SelfTestConfig[1].MSS1);
+    dialog.setMSS2Test(SelfTestConfig[1].MSS2);
+    dialog.setMSS3Test(SelfTestConfig[1].MSS3);
+    dialog.setMSS4Test(SelfTestConfig[1].MSS4);
+    dialog.setMSS5Test(SelfTestConfig[1].MSS5);
+
+
+    dialog.exec();
 }
 
 void MainWindow::changeBDDLK1(int val)
@@ -1067,22 +1213,17 @@ void MainWindow::slotSetRegimeSoft(int num)
 void MainWindow::slotReadPVD(quint16 numBD, quint16 numMSS)
 {
 
-    quint8 NumberOfRepeate = 3;
 
+    LoadMSSPVD(data, numBD, numMSS);
 
-
-    while(NumberOfRepeate)
+    if (MBResult == 0)
     {
-        if (LoadMSSPVD(data, numBD, numMSS))
-        {
-            emit MSSData(data);
-            return;
-        }
-        else
-            NumberOfRepeate--;
+        emit MSSData(data);
+        return;
+    } else
+    {
+        emit ErrorMSSLoad();
     }
-
-    emit ErrorMSSLoad();
 
 }
 
@@ -1097,11 +1238,40 @@ void MainWindow::slotOnOffPVD(bool osn, quint8 PVD_A, quint8 PVD_B, quint8 PVD_V
 
     if (osn)
     {
-        MBTcp -> WriteMultipleCoils(PVD_ADDR, PVD_ONOFF_ADDR, 5, data);
+        MBTcp -> WriteMultipleCoils(Block_Addr.PVD1, PVD_ONOFF_ADDR, 5, data);
     } else
-        MBTcp -> WriteMultipleCoils(PVD_ADDR, PVD_ONOFF_ADDR, 5, data);
+        MBTcp -> WriteMultipleCoils(Block_Addr.PVD2, PVD_ONOFF_ADDR, 5, data);
 
 
+}
+
+void MainWindow::slotGetPVDTestResult(bool osn)
+{
+    quint8 data[6];
+
+
+    MBResult = 255;
+
+    if (osn)
+    {
+        MBTcp -> ReadDiscreteInputs(Block_Addr.PVD1, PVD_TEST_RESULT_ADDR_ALL, 6, data);
+    } else
+    {
+        MBTcp -> ReadDiscreteInputs(Block_Addr.PVD2, PVD_TEST_RESULT_ADDR_ALL, 6, data);
+    }
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+
+    if (MBResult == 0)
+    {
+        emit PVDTestResult(data[0], data[5], data[4], data[3], data[2], data[1]);
+        return;
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
 }
 
 void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
@@ -1143,6 +1313,7 @@ void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
         data[1] = 0;
         break;
     }
+    MBResult = 255;
 
     if (osn)
     {
@@ -1151,15 +1322,36 @@ void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
     {
         MBTcp -> WriteMultipleCoils(Block_Addr.PVD2, PVD_REGIME_ADDR, 2, data);
     }
+
+
+
+    while(MBResult == 255)
+    {
+       // qDebug() << MBResult;
+        QApplication::processEvents();
+
+    }
+
+
+
+    if (MBResult == 0)
+    {
+        emit ChangePVDStatusOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
 }
 
 void MainWindow::slotModBusError(int err)
 {
+    qDebug() << Q_FUNC_INFO << err << MBResult;
     MBResult = err;
 }
 
 void MainWindow::slotModBusOk()
 {
+    qDebug() << Q_FUNC_INFO;
     MBResult = 0;
 }
 

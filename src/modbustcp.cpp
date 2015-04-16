@@ -256,4 +256,47 @@ void ModBusTCP::ReadInputRegisters(quint16 slave, quint16 addr, quint16 size, qu
 
 }
 
+void ModBusTCP::ReadDiscreteInputs(quint16 slave, quint16 addr, quint16 size, quint8 *data)
+{
+
+    quint16 repeat = NumberOfRepeat;
+
+    while(repeat)
+    {
+        if (modbus_set_slave(ctx, slave) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error set slave: " << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    repeat = NumberOfRepeat;
+
+    while(repeat)
+    {
+        if (modbus_read_input_bits(ctx, addr, size, data) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error read DiscreteInputs: " << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    qDebug() << "Read OK" << repeat;
+    emit ModBusOK();
+}
+
 

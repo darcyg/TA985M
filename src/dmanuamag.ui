@@ -1,72 +1,146 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>dManualPVD</class>
- <widget class="QDialog" name="dManualPVD">
+ <class>dManuaMAG</class>
+ <widget class="QDialog" name="dManuaMAG">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>688</width>
-    <height>542</height>
+    <height>532</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Ручное управление имитатором ПВД</string>
+   <string>Dialog</string>
   </property>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>20</y>
-     <width>151</width>
-     <height>171</height>
+     <x>9</x>
+     <y>10</y>
+     <width>201</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
-    <string>Включение опроса</string>
+    <string>Режим работы</string>
    </property>
-   <widget class="QWidget" name="verticalLayoutWidget">
+   <widget class="QWidget" name="verticalLayoutWidget_4">
     <property name="geometry">
      <rect>
       <x>0</x>
       <y>20</y>
-      <width>151</width>
-      <height>151</height>
+      <width>201</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="QComboBox" name="cbRegim">
+       <item>
+        <property name="text">
+         <string>Отключено</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Работа</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Тест BRAM</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>Самоконтроль</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item>
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>Адрес абонента:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSpinBox" name="sbAddr"/>
+     </item>
+     <item>
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_2">
+   <property name="geometry">
+    <rect>
+     <x>220</x>
+     <y>10</y>
+     <width>141</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Внешняя сетка</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>20</y>
+      <width>121</width>
+      <height>91</height>
      </rect>
     </property>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QCheckBox" name="cbBD_A_On">
+      <widget class="QRadioButton" name="rbFry_O">
        <property name="text">
-        <string>Включить БД-А</string>
+        <string>Отключена</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbBD_B_On">
+      <widget class="QRadioButton" name="rbFry_1">
        <property name="text">
-        <string>Включить БД-Б</string>
+        <string>F-1, F5-1</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QCheckBox" name="cbBD_V_On">
+      <widget class="QRadioButton" name="rbFry_2">
        <property name="text">
-        <string>Включить БД-В</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbBD_G_On">
-       <property name="text">
-        <string>Включить БД-Г</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbBD_D_On">
-       <property name="text">
-        <string>Включить БД-Д</string>
+        <string>F-2, F5-2</string>
        </property>
       </widget>
      </item>
@@ -76,69 +150,36 @@
   <widget class="QGroupBox" name="groupBox_3">
    <property name="geometry">
     <rect>
-     <x>190</x>
-     <y>20</y>
-     <width>491</width>
-     <height>111</height>
+     <x>370</x>
+     <y>10</y>
+     <width>131</width>
+     <height>151</height>
     </rect>
    </property>
    <property name="title">
-    <string>Режим работы</string>
+    <string>Выбор магистрали</string>
    </property>
-   <widget class="QComboBox" name="cbStatus">
+   <widget class="QWidget" name="verticalLayoutWidget_2">
     <property name="geometry">
      <rect>
       <x>10</x>
       <y>30</y>
-      <width>179</width>
-      <height>23</height>
+      <width>111</width>
+      <height>71</height>
      </rect>
     </property>
-    <item>
-     <property name="text">
-      <string>Выключено</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Работа</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Тест BRAM</string>
-     </property>
-    </item>
-    <item>
-     <property name="text">
-      <string>Самоконтроль</string>
-     </property>
-    </item>
-   </widget>
-   <widget class="QWidget" name="horizontalLayoutWidget_2">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>60</y>
-      <width>471</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_2">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="QRadioButton" name="rbPVD_Osn">
+      <widget class="QRadioButton" name="rbMAG_osn">
        <property name="text">
-        <string>Основной ПВД</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
+        <string>Основная</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QRadioButton" name="rbPVD_Res">
+      <widget class="QRadioButton" name="rbMAG_res">
        <property name="text">
-        <string>Резервный ПВД</string>
+        <string>Резервная</string>
        </property>
       </widget>
      </item>
@@ -148,8 +189,67 @@
   <widget class="QGroupBox" name="groupBox_4">
    <property name="geometry">
     <rect>
+     <x>510</x>
+     <y>10</y>
+     <width>161</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Выбор синхронизации</string>
+   </property>
+   <widget class="QWidget" name="verticalLayoutWidget_3">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>20</y>
+      <width>151</width>
+      <height>131</height>
+     </rect>
+    </property>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
+     <property name="sizeConstraint">
+      <enum>QLayout::SetDefaultConstraint</enum>
+     </property>
+     <property name="leftMargin">
+      <number>15</number>
+     </property>
+     <item>
+      <widget class="QRadioButton" name="rbF2">
+       <property name="text">
+        <string>F2</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbF3">
+       <property name="text">
+        <string>F3</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbF4">
+       <property name="text">
+        <string>F4</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QRadioButton" name="rbF5">
+       <property name="text">
+        <string>F5</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_5">
+   <property name="geometry">
+    <rect>
      <x>10</x>
-     <y>200</y>
+     <y>190</y>
      <width>671</width>
      <height>331</height>
     </rect>
@@ -242,7 +342,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="label_2">
        <property name="text">
         <string>Канал ЛК:</string>
        </property>
@@ -286,7 +386,7 @@
       </spacer>
      </item>
      <item>
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="label_4">
        <property name="text">
         <string>Режим чтения:</string>
        </property>
@@ -333,73 +433,6 @@
       <widget class="QPushButton" name="pbRead">
        <property name="text">
         <string>Прочитать</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </widget>
-  </widget>
-  <widget class="QGroupBox" name="groupBox_2">
-   <property name="geometry">
-    <rect>
-     <x>190</x>
-     <y>140</y>
-     <width>491</width>
-     <height>61</height>
-    </rect>
-   </property>
-   <property name="title">
-    <string>Результат самоконтроля</string>
-   </property>
-   <widget class="QWidget" name="horizontalLayoutWidget_3">
-    <property name="geometry">
-     <rect>
-      <x>10</x>
-      <y>20</y>
-      <width>471</width>
-      <height>41</height>
-     </rect>
-    </property>
-    <layout class="QHBoxLayout" name="horizontalLayout_3">
-     <item>
-      <widget class="QCheckBox" name="cbTestA">
-       <property name="text">
-        <string>ПВД-А</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbTestB">
-       <property name="text">
-        <string>ПВД-Б</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbTestV">
-       <property name="text">
-        <string>ПВД-В</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbTestG">
-       <property name="text">
-        <string>ПВД-Г</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QCheckBox" name="cbTestD">
-       <property name="text">
-        <string>ПВД-Д</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pbGetTest">
-       <property name="text">
-        <string>Запросить</string>
        </property>
       </widget>
      </item>
