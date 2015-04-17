@@ -12,9 +12,16 @@
 #define WAIT_TIME_FOR_GET_PVD_TEST          4
 
 
+#define SET_LABEL_RED_TEXT(X, Y)    X -> setText(QString("<font color=\"red\">%1</font>").arg(Y))
+#define SET_LABEL_GREEN_TEXT(X, Y)    X -> setText(QString("<font color=\"green\">%1</font>").arg(Y))
+#define SET_LABEL_YELLOW_TEXT(X, Y)  X -> setText(QString("<font color=\"yellow\">%1</font>").arg(Y))
+#define SET_LABEL_GREY_TEXT(X, Y)    X -> setText(QString("<font color=\"grey\">%1</font>").arg(Y))
+
+
 enum CHECK_STAGE {START,
                   SET_PVD1, WAIT_FOR_SET_PVD1, CHEKING_PVD1, CHECK_PVD1,
-                  SET_PVD2, WAIT_FOR_SET_PVD2, CHEKING_PVD2, CHECK_PVD2};
+                  SET_PVD2, WAIT_FOR_SET_PVD2, CHEKING_PVD2, CHECK_PVD2,
+                  SET_MAG1, WAIT_FOR_SET_MAG1, CHEKING_MAG1, CHECK_MAG1};
 
 class dSelfTest : public QDialog, private Ui::dSelfTest
 {
@@ -46,6 +53,7 @@ private:
     quint32 AllCheckTime;
 
     void stoppingCheck();
+    void startingCheck();
 
 public:
     explicit dSelfTest(QWidget *parent = 0);
@@ -60,8 +68,22 @@ public:
     void setMSS4Test(bool val) {cbMSS4Test -> setChecked(val);}
     void setMSS5Test(bool val) {cbMSS5Test -> setChecked(val);}
 
+    void setControl(bool cnt);
+
 
 public slots:
+
+
+    void ChangePVD1();
+    void ChangePVD2();
+    void ChangeMAG1();
+    void ChangeMAG2();
+    void ChangeMSS1();
+    void ChangeMSS2();
+    void ChangeMSS3();
+    void ChangeMSS4();
+    void ChangeMSS5();
+
 
     void StartTest();
     void StopTest();

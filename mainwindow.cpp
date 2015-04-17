@@ -602,14 +602,30 @@ MainWindow::MainWindow(QWidget *parent) :
   //  logTableView -> resizeRowToContents();
     logTableView -> setWordWrap(false);
 
-
     secretMenu = new QMenu("Secret menu");
 
+    QAction *act1 = new QAction(this);
+
+    act1 -> setText(tr("Отключение управления самоконтроля"));
+    act1 -> setCheckable(true);
+    act1 -> setChecked(true);
+
+
+
+    secretMenu -> addAction(act1);
+
+    connect(act1, SIGNAL(triggered(bool)), this, SLOT(slotSelfTestControl(bool)));
+
+
+
+    SelfTestControl = false;
 
     secretMenu -> addAction("Настройка отладки",
                             this,
                             SLOT(slotDebugMenu()),
                             Qt::CTRL + Qt::Key_0);
+
+
     secretMenu -> addAction("Ручное управление МСС",
                             this,
                             SLOT(slotManulMSS()),
@@ -930,6 +946,11 @@ void MainWindow::slotDebugMenu()
     qDebug() << "Секретное меню отладки";
 }
 
+void MainWindow::slotSelfTestControl(bool tt)
+{
+    SelfTestControl = !tt;
+}
+
 void MainWindow::slotManulMSS()
 {
     dManualLoadMSS manWin;
@@ -1080,6 +1101,10 @@ void MainWindow::slotSelfTest1()
     connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
     connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
 
+
+    dialog.setControl(SelfTestControl);
+
+
     dialog.exec();
 }
 
@@ -1098,6 +1123,15 @@ void MainWindow::slotSelfTest2()
     dialog.setMSS4Test(SelfTestConfig[1].MSS4);
     dialog.setMSS5Test(SelfTestConfig[1].MSS5);
 
+    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
+            &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
+
+
+    dialog.setEnabled(SelfTestControl);
 
     dialog.exec();
 }

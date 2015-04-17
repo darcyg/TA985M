@@ -74,6 +74,8 @@ private:
 
     ModBusTCP *MBTcp;
 
+    bool SelfTestControl;
+
     quint8 currentRegim[4][5];
 
     void MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 regim3, quint8 regim4);
@@ -153,12 +155,14 @@ public slots:
     void slotCheckPVD();
 
     void slotDebugMenu();
+    void slotSelfTestControl(bool tt);
     void slotManulMSS();
     void slotSetMSSFileName();
     void slotManualPVD();
     void slotManualMAG();
 
     void slotSecretMenuView(QPoint pe);
+
 
 
     void slotLoadMSS(quint8 num, quint8 ch1, quint8 ch2, quint8 ch3, quint8 ch4);

@@ -104,16 +104,6 @@
     </item>
    </layout>
   </widget>
-  <widget class="QTableView" name="tableView">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>221</y>
-     <width>651</width>
-     <height>221</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
@@ -259,10 +249,10 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>9</x>
-     <y>160</y>
+     <x>10</x>
+     <y>170</y>
      <width>651</width>
-     <height>51</height>
+     <height>101</height>
     </rect>
    </property>
    <property name="title">
@@ -271,8 +261,8 @@
    <widget class="QProgressBar" name="progressBar">
     <property name="geometry">
      <rect>
-      <x>7</x>
-      <y>20</y>
+      <x>10</x>
+      <y>40</y>
       <width>641</width>
       <height>31</height>
      </rect>
@@ -283,6 +273,94 @@
     <property name="textVisible">
      <bool>true</bool>
     </property>
+   </widget>
+  </widget>
+  <widget class="QGroupBox" name="groupBox_3">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>280</y>
+     <width>651</width>
+     <height>151</height>
+    </rect>
+   </property>
+   <property name="title">
+    <string>Результат проверки</string>
+   </property>
+   <widget class="QWidget" name="gridLayoutWidget">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>30</y>
+      <width>631</width>
+      <height>111</height>
+     </rect>
+    </property>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QLabel" name="lPVD1Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="lMAG1Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QLabel" name="lPVD2Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QLabel" name="lMAG2Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="lMSS1Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QLabel" name="lMSS2Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QLabel" name="lMSS3Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QLabel" name="lMSS4Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QLabel" name="lMSS5Result">
+       <property name="text">
+        <string>TextLabel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </widget>
   </widget>
  </widget>
