@@ -3,26 +3,67 @@
 void dSelfTest::stoppingCheck()
 {
 
-    progressBar -> setHidden(true);
+    CheckTimer -> stop();
 
-    pbStartTest -> setEnabled(true);
-    pbStopTest -> setDisabled(true);
 
     setOK = false; setError = false;
-
+// -==== Off PVD1 ====-
     emit setPVDStatus(true, 0);
 
     while(!setOK & !setError)
         QApplication::processEvents();
 
+// -==== Off PVD2 ====-
     emit setPVDStatus(false, 0);
 
     while(!setOK & !setError)
         QApplication::processEvents();
 
+// -==== Off MSS11 ====-
 
-    CheckTimer -> stop();
+    emit setMSSSelfTest(0, false, false, false, false);
+
+    while(!setOK & !setError)
+        QApplication::processEvents();
+
+// -==== Off MSS12 ====-
+
+     emit setMSSSelfTest(1, false, false, false, false);
+
+     while(!setOK & !setError)
+        QApplication::processEvents();
+
+// -==== Off MSS13 ====-
+
+      emit setMSSSelfTest(2, false, false, false, false);
+
+      while(!setOK & !setError)
+        QApplication::processEvents();
+
+
+// -==== Off MSS14 ====-
+
+       emit setMSSSelfTest(3, false, false, false, false);
+
+       while(!setOK & !setError)
+         QApplication::processEvents();
+
+// -==== Off MSS15 ====-
+
+       emit setMSSSelfTest(4, false, false, false, false);
+
+       while(!setOK & !setError)
+         QApplication::processEvents();
+
+
+
     doTest = false;
+
+    progressBar -> setHidden(true);
+
+    pbStartTest -> setEnabled(true);
+    pbStopTest -> setDisabled(true);
+
 }
 
 void dSelfTest::startingCheck()
@@ -252,6 +293,9 @@ void dSelfTest::OnTimeOut()
 
             break;
 
+ // =========================================================================================================================================================
+
+
         case SET_PVD1:
 
             qDebug() << "SET_PVD1";
@@ -388,6 +432,9 @@ void dSelfTest::OnTimeOut()
 
             break;
 
+// =========================================================================================================================================================
+
+
         case SET_PVD2:
 
             qDebug() << "SET_PVD2";
@@ -517,18 +564,714 @@ void dSelfTest::OnTimeOut()
                 {
                     qDebug() << "Error receive SelfTest data for PVD2";
                     QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока ПВД2"), QMessageBox::Ok);
-                    SET_LABEL_RED_TEXT(lPVD1Result, QString(tr("ПВД2")));
+                    SET_LABEL_RED_TEXT(lPVD2Result, QString(tr("ПВД2")));
                     stoppingCheck();
                 }
             }
 
             break;
 
-
+// =========================================================================================================================================================
             case SET_MAG1:
+            qDebug() << "SET_MAG1";
 
-                stoppingCheck();
+            if (cbMAG1Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_PVD;
+                setOK = false;
+                setError = false;
+               // emit setMAGStatus(true, 3);
+                CheckStage = WAIT_FOR_SET_MAG1;
+            } else
+            {
+                CheckStage = SET_MAG2;
+            }
+
+            break;
                 break;
+
+// =========================================================================================================================================================
+
+        case SET_MAG2:
+        qDebug() << "SET_MAG2";
+
+        if (cbMAG2Test -> isChecked())
+        {
+
+            wait_time = WAIT_TIME_FOR_SET_PVD;
+            setOK = false;
+            setError = false;
+           // emit setMAGStatus(true, 3);
+            CheckStage = WAIT_FOR_SET_MAG2;
+        } else
+        {
+            CheckStage = SET_MSS1;
+        }
+
+        break;
+            break;
+
+// =========================================================================================================================================================
+
+        case SET_MSS1:
+
+            qDebug() << "SET_MSS1";
+
+            if (cbMSS1Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_MSS;
+                setOK = false;
+                setError = false;
+                emit setMSSSelfTest(0, true, true, true, true);
+                CheckStage = WAIT_FOR_SET_MSS1;
+            } else
+            {
+                CheckStage = SET_MSS2;
+            }
+
+            break;
+
+        case WAIT_FOR_SET_MSS1:
+
+            qDebug() << "WAIT_FOR_SET_MSS1";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MSS1;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MSS1";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС1"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS1Result, QString(tr("МСС1")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MSS1:
+
+            qDebug() << "CHEKING_MSS1";
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MSS_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MSS1;
+                emit getMSSTestResult(0);
+            }
+
+            break;
+
+
+        case CHECK_MSS1:
+
+
+            qDebug() << "CHECK_MSS1";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MSS1 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля  МСС1"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МСС1 каналы: ");
+                    if (MSS1_Result) ErrString.append(tr("А"));
+                    if (MSS2_Result) {
+                        if (MSS1_Result)
+                            ErrString.append(tr(", Б"));
+                        else
+                            ErrString.append(tr("Б"));
+                    }
+
+                    if (MSS3_Result) {
+                        if (MSS1_Result | MSS2_Result)
+                            ErrString.append(tr(", В"));
+                        else
+                            ErrString.append(tr("В"));
+                    }
+
+                    if (MSS4_Result){
+                        if (MSS1_Result | MSS2_Result | MSS3_Result)
+                            ErrString.append(tr(", Г"));
+                        else
+                            ErrString.append(tr("Г"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMSS1Result, QString(tr("МСС1")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    SET_LABEL_GREEN_TEXT(lMSS1Result, QString(tr("МСС1")));
+                    CheckStage = SET_MSS2;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MSS1";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС1"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS1Result, QString(tr("МСС1")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
+
+// =========================================================================================================================================================
+        case SET_MSS2:
+
+            qDebug() << "SET_MSS2";
+
+            if (cbMSS2Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_MSS;
+                setOK = false;
+                setError = false;
+                emit setMSSSelfTest(1, true, true, true, true);
+                CheckStage = WAIT_FOR_SET_MSS2;
+            } else
+            {
+                CheckStage = SET_MSS3;
+            }
+
+            break;
+
+        case WAIT_FOR_SET_MSS2:
+
+            qDebug() << "WAIT_FOR_SET_MSS2";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MSS2;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MSS2";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС2"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS2Result, QString(tr("МСС2")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MSS2:
+
+            qDebug() << "CHEKING_MSS2";
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MSS_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MSS2;
+                emit getMSSTestResult(1);
+            }
+
+            break;
+
+
+        case CHECK_MSS2:
+
+
+            qDebug() << "CHECK_MSS2";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MSS2 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля  МСС2"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МСС2 каналы: ");
+                    if (MSS1_Result) ErrString.append(tr("А"));
+                    if (MSS2_Result) {
+                        if (MSS1_Result)
+                            ErrString.append(tr(", Б"));
+                        else
+                            ErrString.append(tr("Б"));
+                    }
+
+                    if (MSS3_Result) {
+                        if (MSS1_Result | MSS2_Result)
+                            ErrString.append(tr(", В"));
+                        else
+                            ErrString.append(tr("В"));
+                    }
+
+                    if (MSS4_Result){
+                        if (MSS1_Result | MSS2_Result | MSS3_Result)
+                            ErrString.append(tr(", Г"));
+                        else
+                            ErrString.append(tr("Г"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMSS2Result, QString(tr("МСС2")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    SET_LABEL_GREEN_TEXT(lMSS2Result, QString(tr("МСС2")));
+                    CheckStage = SET_MSS3;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MSS2";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС2"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS2Result, QString(tr("МСС2")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
+// =========================================================================================================================================================
+
+        case SET_MSS3:
+
+            qDebug() << "SET_MSS3";
+
+            if (cbMSS3Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_MSS;
+                setOK = false;
+                setError = false;
+                emit setMSSSelfTest(2, true, true, true, true);
+                CheckStage = WAIT_FOR_SET_MSS3;
+            } else
+            {
+                CheckStage = SET_MSS4;
+            }
+
+            break;
+
+        case WAIT_FOR_SET_MSS3:
+
+            qDebug() << "WAIT_FOR_SET_MSS3";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MSS3;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MSS3";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС3"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS3Result, QString(tr("МСС3")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MSS3:
+
+            qDebug() << "CHEKING_MSS3";
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MSS_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MSS3;
+                emit getMSSTestResult(2);
+            }
+
+            break;
+
+
+        case CHECK_MSS3:
+
+
+            qDebug() << "CHECK_MSS3";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MSS3 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля  МСС3"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МСС3 каналы: ");
+                    if (MSS1_Result) ErrString.append(tr("А"));
+                    if (MSS2_Result) {
+                        if (MSS1_Result)
+                            ErrString.append(tr(", Б"));
+                        else
+                            ErrString.append(tr("Б"));
+                    }
+
+                    if (MSS3_Result) {
+                        if (MSS1_Result | MSS2_Result)
+                            ErrString.append(tr(", В"));
+                        else
+                            ErrString.append(tr("В"));
+                    }
+
+                    if (MSS4_Result){
+                        if (MSS1_Result | MSS2_Result | MSS3_Result)
+                            ErrString.append(tr(", Г"));
+                        else
+                            ErrString.append(tr("Г"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMSS3Result, QString(tr("МСС3")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    SET_LABEL_GREEN_TEXT(lMSS3Result, QString(tr("МСС3")));
+                    CheckStage = SET_MSS4;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MSS3";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС3"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS3Result, QString(tr("МСС3")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
+// =========================================================================================================================================================
+
+        case SET_MSS4:
+
+            qDebug() << "SET_MSS4";
+
+            if (cbMSS4Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_MSS;
+                setOK = false;
+                setError = false;
+                emit setMSSSelfTest(3, true, true, true, true);
+                CheckStage = WAIT_FOR_SET_MSS4;
+            } else
+            {
+                CheckStage = SET_MSS5;
+            }
+
+            break;
+
+        case WAIT_FOR_SET_MSS4:
+
+            qDebug() << "WAIT_FOR_SET_MSS4";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MSS4;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MSS4";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС4"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS4Result, QString(tr("МСС4")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MSS4:
+
+            qDebug() << "CHEKING_MSS4";
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MSS_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MSS4;
+                emit getMSSTestResult(3);
+            }
+
+            break;
+
+
+        case CHECK_MSS4:
+
+
+            qDebug() << "CHECK_MSS4";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MSS4 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля  МСС4"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МСС4 каналы: ");
+                    if (MSS1_Result) ErrString.append(tr("А"));
+                    if (MSS2_Result) {
+                        if (MSS1_Result)
+                            ErrString.append(tr(", Б"));
+                        else
+                            ErrString.append(tr("Б"));
+                    }
+
+                    if (MSS3_Result) {
+                        if (MSS1_Result | MSS2_Result)
+                            ErrString.append(tr(", В"));
+                        else
+                            ErrString.append(tr("В"));
+                    }
+
+                    if (MSS4_Result){
+                        if (MSS1_Result | MSS2_Result | MSS3_Result)
+                            ErrString.append(tr(", Г"));
+                        else
+                            ErrString.append(tr("Г"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMSS4Result, QString(tr("МСС4")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    SET_LABEL_GREEN_TEXT(lMSS4Result, QString(tr("МСС4")));
+                    CheckStage = SET_MSS5;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MSS4";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС4"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS4Result, QString(tr("МСС4")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
+// =========================================================================================================================================================
+
+        case SET_MSS5:
+
+            qDebug() << "SET_MSS5";
+
+            if (cbMSS5Test -> isChecked())
+            {
+
+                wait_time = WAIT_TIME_FOR_SET_MSS;
+                setOK = false;
+                setError = false;
+                emit setMSSSelfTest(4, true, true, true, true);
+                CheckStage = WAIT_FOR_SET_MSS5;
+            } else
+            {
+                CheckStage = END_TEST;
+            }
+
+            break;
+
+        case WAIT_FOR_SET_MSS5:
+
+            qDebug() << "WAIT_FOR_SET_MSS5";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MSS5;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MSS5";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС5"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS5Result, QString(tr("МСС5")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MSS5:
+
+            qDebug() << "CHEKING_MSS5";
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MSS_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MSS5;
+                emit getMSSTestResult(4);
+            }
+
+            break;
+
+
+        case CHECK_MSS5:
+
+
+            qDebug() << "CHECK_MSS5";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MSS5 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля  МСС5"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МСС5 каналы: ");
+                    if (MSS1_Result) ErrString.append(tr("А"));
+                    if (MSS2_Result) {
+                        if (MSS1_Result)
+                            ErrString.append(tr(", Б"));
+                        else
+                            ErrString.append(tr("Б"));
+                    }
+
+                    if (MSS3_Result) {
+                        if (MSS1_Result | MSS2_Result)
+                            ErrString.append(tr(", В"));
+                        else
+                            ErrString.append(tr("В"));
+                    }
+
+                    if (MSS4_Result){
+                        if (MSS1_Result | MSS2_Result | MSS3_Result)
+                            ErrString.append(tr(", Г"));
+                        else
+                            ErrString.append(tr("Г"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMSS1Result, QString(tr("МСС1")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    SET_LABEL_GREEN_TEXT(lMSS5Result, QString(tr("МСС5")));
+                    CheckStage = END_TEST;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MSS5";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МСС5"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMSS5Result, QString(tr("МСС5")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
+// =========================================================================================================================================================
+
+        case END_TEST:
+
+            QMessageBox::warning(this, tr("Самоконтрроль"), tr("Проварка самоконтроля ТК168 пройдена"), QMessageBox::Ok);
+            stoppingCheck();
+            break;
+
+// =========================================================================================================================================================
+
 
 
         }
@@ -542,6 +1285,12 @@ void dSelfTest::OnTimeOut()
 }
 
 void dSelfTest::slotChangePVDStatusOK()
+{
+    setOK = true;
+    setError = false;
+}
+
+void dSelfTest::slotChangeMSSSelfTestSetOK()
 {
     setOK = true;
     setError = false;
@@ -567,4 +1316,16 @@ void dSelfTest::slotPVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, 
     PVDG_Result = PVD_G;
     PVDD_Result = PVD_D;
 
+}
+
+void dSelfTest::slotMSSTestResult(bool All, bool ch1, bool ch2, bool ch3, bool ch4)
+{
+    setOK = true;
+    setError = false;
+    ALL_Result = All;
+
+    MSS1_Result = ch1;
+    MSS2_Result = ch2;
+    MSS3_Result = ch3;
+    MSS4_Result = ch4;
 }

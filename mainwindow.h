@@ -192,7 +192,9 @@ public slots:
     void slotReadPVD(quint16 numBD, quint16 numMSS);
     void slotOnOffPVD(bool osn, quint8 PVD_A, quint8 PVD_B, quint8 PVD_V, quint8 PVD_G, quint8 PVD_D);
     void slotGetPVDTestResult(bool osn);
+    void slotGetMSSTestResult(quint8 num);
     void slotChangePVDStatus(bool osn, quint8 status);
+    void slotSetMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bool ch4);
 
 
     void slotModBusError(int err);
@@ -203,8 +205,10 @@ signals:
 
     void MSSData(quint8 *data);
     void PVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, bool PVD_G, bool PVD_D);
+    void MSSTestResult(bool All, bool ch1, bool ch2, bool ch3, bool ch4);
     void ErrorMSSLoad();
     void ChangePVDStatusOK();
+    void ChangeMSSSelfTEstOK();
 
     void ErrorModBus(quint8 err);
 

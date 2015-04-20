@@ -1095,10 +1095,16 @@ void MainWindow::slotSelfTest1()
 
 
     connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(&dialog, SIGNAL(setMSSSelfTest(quint8,bool,bool,bool,bool)),
+            this, SLOT(slotSetMSSSelfTest(quint8,bool,bool,bool,bool)));
     connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(this, SIGNAL(MSSTestResult(bool,bool,bool,bool,bool)),
+            &dialog, SLOT(slotMSSTestResult(bool,bool,bool,bool,bool)));
     connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(&dialog, SIGNAL(getMSSTestResult(quint8)), this, SLOT(slotGetMSSTestResult(quint8)));
     connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ChangeMSSSelfTEstOK()), &dialog, SLOT(slotChangeMSSSelfTestSetOK()));
     connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
 
 
@@ -1124,10 +1130,16 @@ void MainWindow::slotSelfTest2()
     dialog.setMSS5Test(SelfTestConfig[1].MSS5);
 
     connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(&dialog, SIGNAL(setMSSSelfTest(quint8,bool,bool,bool,bool)),
+            this, SLOT(slotSetMSSSelfTest(quint8,bool,bool,bool,bool)));
     connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(this, SIGNAL(MSSTestResult(bool,bool,bool,bool,bool)),
+            &dialog, SLOT(slotMSSTestResult(bool,bool,bool,bool,bool)));
     connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(&dialog, SIGNAL(getMSSTestResult(quint8)), this, SLOT(slotGetMSSTestResult(quint8)));
     connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ChangeMSSSelfTEstOK()), &dialog, SLOT(slotChangeMSSSelfTestSetOK()));
     connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
 
 
@@ -1308,6 +1320,26 @@ void MainWindow::slotGetPVDTestResult(bool osn)
     }
 }
 
+void MainWindow::slotGetMSSTestResult(quint8 num)
+{
+    quint8 data[5];
+
+    MBResult = 255;
+
+    MBTcp -> ReadDiscreteInputs(Block_Addr.MSS_ADDR[num], MSS_TEST_RESULT_ADDR, 5, data);
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        emit MSSTestResult(data[4], data[0], data[1], data[2], data[3]);
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+}
+
 void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
 {
 
@@ -1371,6 +1403,33 @@ void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
     if (MBResult == 0)
     {
         emit ChangePVDStatusOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+}
+
+void MainWindow::slotSetMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bool ch4)
+{
+    quint8 data[4];
+
+    if (ch1) data[0] = 1; else data[0] = 0;
+    if (ch2) data[1] = 1; else data[1] = 0;
+    if (ch3) data[2] = 1; else data[2] = 0;
+    if (ch4) data[3] = 1; else data[3] = 0;
+
+    MBResult = 255;
+
+    MBTcp -> WriteMultipleCoils(Block_Addr.MSS_ADDR[num], MSS_SALFTEST_ADDR, 4, data);
+
+    while(MBResult == 255)
+    {
+        QApplication::processEvents();
+    }
+
+    if(MBResult == 0)
+    {
+        emit ChangeMSSSelfTEstOK();
     } else
     {
         emit ErrorModBus(MBResult);

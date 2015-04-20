@@ -11,6 +11,9 @@
 #define WAIT_TIME_FOR_SET_PVD               4
 #define WAIT_TIME_FOR_GET_PVD_TEST          4
 
+#define WAIT_TIME_FOR_SET_MSS               4
+#define WAIT_TIME_FOR_GET_MSS_TEST          4
+
 
 #define SET_LABEL_RED_TEXT(X, Y)    X -> setText(QString("<font color=\"red\">%1</font>").arg(Y))
 #define SET_LABEL_GREEN_TEXT(X, Y)    X -> setText(QString("<font color=\"green\">%1</font>").arg(Y))
@@ -21,7 +24,15 @@
 enum CHECK_STAGE {START,
                   SET_PVD1, WAIT_FOR_SET_PVD1, CHEKING_PVD1, CHECK_PVD1,
                   SET_PVD2, WAIT_FOR_SET_PVD2, CHEKING_PVD2, CHECK_PVD2,
-                  SET_MAG1, WAIT_FOR_SET_MAG1, CHEKING_MAG1, CHECK_MAG1};
+                  SET_MAG1, WAIT_FOR_SET_MAG1, CHEKING_MAG1, CHECK_MAG1,
+                  SET_MAG2, WAIT_FOR_SET_MAG2, CHEKING_MAG2, CHECK_MAG2,
+                  SET_MSS1, WAIT_FOR_SET_MSS1, CHEKING_MSS1, CHECK_MSS1,
+                  SET_MSS2, WAIT_FOR_SET_MSS2, CHEKING_MSS2, CHECK_MSS2,
+                  SET_MSS3, WAIT_FOR_SET_MSS3, CHEKING_MSS3, CHECK_MSS3,
+                  SET_MSS4, WAIT_FOR_SET_MSS4, CHEKING_MSS4, CHECK_MSS4,
+                  SET_MSS5, WAIT_FOR_SET_MSS5, CHEKING_MSS5, CHECK_MSS5,
+                  END_TEST
+                 };
 
 class dSelfTest : public QDialog, private Ui::dSelfTest
 {
@@ -42,6 +53,12 @@ private:
     bool PVDV_Result;
     bool PVDG_Result;
     bool PVDD_Result;
+
+
+    bool MSS1_Result;
+    bool MSS2_Result;
+    bool MSS3_Result;
+    bool MSS4_Result;
 
     bool ALL_Result;
 
@@ -91,14 +108,19 @@ public slots:
     void OnTimeOut();
 
     void slotChangePVDStatusOK();
+    void slotChangeMSSSelfTestSetOK();
     void slotModBusError(quint8 error);
 
     void slotPVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, bool PVD_G, bool PVD_D);
+    void slotMSSTestResult(bool All, bool ch1, bool ch2, bool ch3, bool ch4);
 
 signals:
 
     void setPVDStatus(bool osn, quint8 status);
     void getPVDTestResult(bool osn);
+
+    void setMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bool ch4);
+    void getMSSTestResult(quint8 num);
 };
 
 #endif // DSELFTEST_H

@@ -29,6 +29,9 @@
 #define MSS_CHANAL4_ADDR        0
 #define MSS_CHANAL_ADDR         4
 
+#define MSS_SALFTEST_ADDR       6
+#define MSS_TEST_RESULT_ADDR    4
+
 #define MSS_BLOCK_WRITE         128
 
 
