@@ -10,7 +10,15 @@
 
 #define PVD_ADDR                24
 
+#define ADDR_REGIM_LKG_1            2
+#define ADDR_REGIM_LKG_2            3
+#define ADDR_REGIM_LKG_3            4
+#define ADDR_REGIM_LKG_4            5
 
+#define ADDR_REGIM_LKD_1            6
+#define ADDR_REGIM_LKD_2            7
+#define ADDR_REGIM_LKD_3            8
+#define ADDR_REGIM_LKD_4            9
 
 #define MSS_BUFF_SIZE           256
 #define MSS_BUFF_SIZE_WORD      (MSS_BUFF_SIZE / 2)

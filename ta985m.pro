@@ -38,7 +38,7 @@ HEADERS  += mainwindow.h \
             3rdparty/libmodbus/modbus-rtu-private.h \
             3rdparty/libmodbus/modbus-private.h \
             3rdparty/libmodbus/config.h \
-    ../TK168/src/tk168_config.h \
+    # ../TK168/src/tk168_config.h \
     src/viewbd.h \
     src/dmanualloadmss.h \
     src/dmssfileset.h \
@@ -56,5 +56,4 @@ FORMS    += mainwindow.ui \
     src/dselftest.ui
 
 
-INCLUDEPATH += 3rdparty/libmodbus \
-               /home/dimsun/work/Qt_Project/TK168/src
+INCLUDEPATH += 3rdparty/libmodbus

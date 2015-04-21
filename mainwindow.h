@@ -20,7 +20,7 @@
 
 
 #include "src/modbustcp.h"
-#include "tk168_config.h"
+//#include "tk168_config.h"
 #include "src/dmanualpvd.h"
 
 #include "src/ta985m.h"
