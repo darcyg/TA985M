@@ -281,8 +281,9 @@ void MainWindow::ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS
 
 
 /*
- * Запрос данных одного МСС с БД
+ * Запрос данных одного МСС с БД или МАГ
  *
+ * typeImm      - Откуда читать (0 - Основной ПВД, 1 - резервный ПВД, 2 - МАГ
  * data         - принятые данные   (Передается указатель с ыделенной памятью на 256 байт)
  * num_bd       - номер БД          с 0
  * num_mss      - номер МСС         с 0
@@ -292,17 +293,27 @@ void MainWindow::ChangeRegimMSS(quint16 num, quint8 regimeMSS1, quint8 regimeMSS
  *
  */
 
-void MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
+void MainWindow::LoadMSSFromImm(quint8 typeImm, quint8 *data, quint8 num_bd, quint8 num_mss)
 {
 
 
     quint16 Addr;  // Адрес данных МСС
 
+    quint16 ImmAddr;
+
     quint16 *data_t = (quint16 *)data;
 
     quint16 read_data[MSS_READ_BUFF_SIZE];
 
+
+    if (typeImm == 0) ImmAddr = Block_Addr.PVD1;
+    if (typeImm == 1) ImmAddr = Block_Addr.PVD2;
+    if (typeImm == 2) ImmAddr = Block_Addr.MAG_ADDR;
+
+
     Addr = num_bd * 128 + num_mss * MSS_BUFF_SIZE;
+
+
 
     for (int i = 0; i < MSS_BUFF_SIZE_WORD / MSS_READ_BUFF_SIZE; i++)  // Читаем порциями по 64 слова
     {
@@ -310,7 +321,8 @@ void MainWindow::LoadMSSPVD(quint8 *data, quint8 num_bd, quint8 num_mss)
 
 
         MBResult = 255;
-        MBTcp -> ReadInputRegisters(PVD_ADDR, Addr, MSS_READ_BUFF_SIZE, read_data);
+
+        MBTcp -> ReadInputRegisters(ImmAddr, Addr, MSS_READ_BUFF_SIZE, read_data);
 
         WAIT_FOR_MODBUS_TRANSMIT(MBResult)
 
@@ -334,6 +346,11 @@ bool MainWindow::CheckMSS(quint8 *data, quint8 Regime, quint8 FileMSS)
 
 }
 
+
+/*
+ *  Чтение основного файла конфигурации
+ *
+ */
 
 void MainWindow::ReadSettings()
 {
@@ -374,6 +391,7 @@ void MainWindow::ReadSettings()
         Block_Addr.MSS_ADDR[4] = setupFile.value("MSS5", 6).toInt();
 
         Block_Addr.MAG_ADDR = setupFile.value("MAG", 33).toInt();
+        Block_Addr.KOMMSS_ADDR = setupFile.value("KOM_MSS", 40).toInt();
 
     setupFile.endGroup();
 
@@ -417,6 +435,12 @@ void MainWindow::ReadSettings()
 
 }
 
+/*
+ *
+ * Запись основного файла конфигурации
+ *
+ */
+
 void MainWindow::WriteSettings()
 {
     QSettings setupFile(QApplication::applicationDirPath() + "/" + QApplication::applicationName() + ".ini", QSettings::IniFormat);
@@ -449,6 +473,7 @@ void MainWindow::WriteSettings()
         setupFile.setValue("MSS5", Block_Addr.MSS_ADDR[4]);
 
         setupFile.setValue("MAG", Block_Addr.MAG_ADDR);
+        setupFile.setValue("KOM_MSS", Block_Addr.KOMMSS_ADDR);
 
        setupFile.endGroup();
 
@@ -497,6 +522,12 @@ void MainWindow::WriteSettings()
 
 }
 
+/*
+ *
+ * Чтение файла конфигурации, в зависимости от режима ПМО (regim - номер режима)
+ *
+ */
+
 void MainWindow::ReadRegimSettings(int regim)
 {
     QSettings regimSettingsFile(QApplication::applicationDirPath() + "/Config/" + SoftRegimFileName + ".ini", QSettings::IniFormat);
@@ -539,6 +570,12 @@ void MainWindow::ReadRegimSettings(int regim)
 
 }
 
+/*
+ *
+ * Запись файла конфигурации, в зависимости от режима ПМО (regim - номер режима)
+ *
+ */
+
 void MainWindow::WriteRegimSettings(int regim)
 {
 
@@ -580,6 +617,13 @@ void MainWindow::WriteRegimSettings(int regim)
      regimSettingsFile.endGroup();
 
 }
+
+
+/*
+ *
+ * Конструктор основоного окна
+ *
+ */
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
@@ -645,6 +689,10 @@ MainWindow::MainWindow(QWidget *parent) :
                             this,
                             SLOT(slotManualMAG()),
                             Qt::CTRL + Qt::Key_4);
+    secretMenu -> addAction("Ручное управление Ком.МСС",
+                            this,
+                            SLOT(slotManualKomMSS()),
+                            Qt::CTRL + Qt::Key_5);
 
 
 
@@ -981,14 +1029,14 @@ void MainWindow::slotManualPVD()
     dManualPVD dialog;
 
 
-    connect(&dialog, SIGNAL(getPVDData(quint16,quint16)), this, SLOT(slotReadPVD(quint16,quint16)));
+    connect(&dialog, SIGNAL(getPVDData(bool, quint16,quint16)), this, SLOT(slotReadPVD(bool, quint16,quint16)));
     connect(this, SIGNAL(ErrorMSSLoad()), &dialog, SLOT(slot_ErrorMSS()));
     connect(this, SIGNAL(MSSData(quint8*)), &dialog, SLOT(slot_ReceivedMSS(quint8*)));
 
     connect(&dialog, SIGNAL(OnOffPVD(bool,quint8,quint8,quint8,quint8,quint8)),
             this, SLOT(slotOnOffPVD(bool,quint8,quint8,quint8,quint8,quint8)));
     connect(&dialog, SIGNAL(ChangePVDStatus(bool,quint8)),
-            this, SLOT(slotChangePVDStatus(bool,quint8)));
+            this, SLOT(slotChangePVDWRegime(bool,quint8)));
 
     connect(&dialog, SIGNAL(GetTest(bool)), this, SLOT(slotGetPVDTestResult(bool)));
     connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
@@ -1001,6 +1049,29 @@ void MainWindow::slotManualPVD()
 
 void MainWindow::slotManualMAG()
 {
+    dManuaMAG dialog;
+
+    connect(&dialog, SIGNAL(ChangeStatus(quint8)), this, SLOT(slotChangeMAGWRegime(quint8)));
+
+
+
+    connect(this, SIGNAL(ChangeMAGStatusOK()), &dialog, SLOT(slot_MAGChangeStatusOK()));
+    connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slot_ErrorModBus(quint8)));
+
+    dialog.exec();
+
+}
+
+void MainWindow::slotManualKomMSS()
+{
+
+    dManualKomMSS dialog;
+
+    connect(&dialog, SIGNAL(MSSSwitch(quint8,quint8)), this, SLOT(slotSwitchMSS(quint8,quint8)));
+    connect(this, SIGNAL(MSSSwitchOK()), &dialog, SLOT(slotSwitchOK()));
+    connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotMBError(quint8)));
+
+    dialog.exec();
 
 }
 
@@ -1029,6 +1100,12 @@ void MainWindow::slotConnect()
     qDebug() << "Connect to IP";
 
     MBTcp -> Connect();
+
+    if (true)
+    {
+        pbConnect -> setDisabled(true);
+        pbDisConnect -> setEnabled(true);
+    }
 }
 
 void MainWindow::slotDisConnect()
@@ -1094,16 +1171,20 @@ void MainWindow::slotSelfTest1()
     dialog.setMSS5Test(SelfTestConfig[0].MSS5);
 
 
-    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDWRegime(bool,quint8)));
+    connect(&dialog, SIGNAL(setMAGStatus(quint8)), this, SLOT(slotChangeMAGWRegime(quint8)));
     connect(&dialog, SIGNAL(setMSSSelfTest(quint8,bool,bool,bool,bool)),
             this, SLOT(slotSetMSSSelfTest(quint8,bool,bool,bool,bool)));
     connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(this, SIGNAL(MAGTestResult(bool,bool*)), &dialog, SLOT(slotMAGTestResult(bool,bool*)));
     connect(this, SIGNAL(MSSTestResult(bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotMSSTestResult(bool,bool,bool,bool,bool)));
     connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(&dialog, SIGNAL(getMAGTestResult()), this, SLOT(slotGetMAGTestResult()));
     connect(&dialog, SIGNAL(getMSSTestResult(quint8)), this, SLOT(slotGetMSSTestResult(quint8)));
     connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ChangeMAGStatusOK()), &dialog, SLOT(slotChangeMAGStatusOK()));
     connect(this, SIGNAL(ChangeMSSSelfTEstOK()), &dialog, SLOT(slotChangeMSSSelfTestSetOK()));
     connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
 
@@ -1129,21 +1210,25 @@ void MainWindow::slotSelfTest2()
     dialog.setMSS4Test(SelfTestConfig[1].MSS4);
     dialog.setMSS5Test(SelfTestConfig[1].MSS5);
 
-    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDStatus(bool,quint8)));
+    connect(&dialog, SIGNAL(setPVDStatus(bool,quint8)), this, SLOT(slotChangePVDWRegime(bool,quint8)));
+    connect(&dialog, SIGNAL(setMAGStatus(quint8)), this, SLOT(slotChangeMAGWRegime(quint8)));
     connect(&dialog, SIGNAL(setMSSSelfTest(quint8,bool,bool,bool,bool)),
             this, SLOT(slotSetMSSSelfTest(quint8,bool,bool,bool,bool)));
     connect(this, SIGNAL(PVDTestResult(bool,bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotPVDTestResult(bool,bool,bool,bool,bool,bool)));
+    connect(this, SIGNAL(MAGTestResult(bool,bool[])), &dialog, SLOT(slotMAGTestResult(bool,bool[])));
     connect(this, SIGNAL(MSSTestResult(bool,bool,bool,bool,bool)),
             &dialog, SLOT(slotMSSTestResult(bool,bool,bool,bool,bool)));
     connect(&dialog, SIGNAL(getPVDTestResult(bool)), this, SLOT(slotGetPVDTestResult(bool)));
+    connect(&dialog, SIGNAL(getMAGTestResult()), this, SLOT(slotGetMAGTestResult()));
     connect(&dialog, SIGNAL(getMSSTestResult(quint8)), this, SLOT(slotGetMSSTestResult(quint8)));
     connect(this, SIGNAL(ChangePVDStatusOK()), &dialog, SLOT(slotChangePVDStatusOK()));
+    connect(this, SIGNAL(ChangeMAGStatusOK()), &dialog, SLOT(slotChangeMAGStatusOK()));
     connect(this, SIGNAL(ChangeMSSSelfTEstOK()), &dialog, SLOT(slotChangeMSSSelfTestSetOK()));
     connect(this, SIGNAL(ErrorModBus(quint8)), &dialog, SLOT(slotModBusError(quint8)));
 
 
-    dialog.setEnabled(SelfTestControl);
+    dialog.setControl(SelfTestControl);
 
     dialog.exec();
 }
@@ -1256,11 +1341,17 @@ void MainWindow::slotSetRegimeSoft(int num)
     CurrentSoftRegimeNumber = num;
 }
 
-void MainWindow::slotReadPVD(quint16 numBD, quint16 numMSS)
+void MainWindow::slotReadPVD(bool osn, quint16 numBD, quint16 numMSS)
 {
 
+    quint8 tImm;
 
-    LoadMSSPVD(data, numBD, numMSS);
+    if (osn) tImm = 0; else tImm = 1;
+
+    MBResult = 255;
+
+
+    LoadMSSFromImm(tImm, data, numBD, numMSS);
 
     if (MBResult == 0)
     {
@@ -1273,10 +1364,29 @@ void MainWindow::slotReadPVD(quint16 numBD, quint16 numMSS)
 
 }
 
+void MainWindow::slotReadMAG(quint16 numMSS)
+{
+
+    MBResult = 255;
+
+    LoadMSSFromImm(2, data, 0, numMSS);
+
+    if (MBResult == 0)
+    {
+        emit MSSData(data);
+        return;
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+
+
+}
+
 void MainWindow::slotOnOffPVD(bool osn, quint8 PVD_A, quint8 PVD_B, quint8 PVD_V, quint8 PVD_G, quint8 PVD_D)
 {
 
-    //TODO: Добавить адреса разных ПВД и обработку ошибок (Если не прошло, то сигнал с ошибкой иначе сигнал все ОК)
+    //TODO: Добавить обработку ошибок (Если не прошло, то сигнал с ошибкой иначе сигнал все ОК)
 
     quint8 data[5];
 
@@ -1320,6 +1430,32 @@ void MainWindow::slotGetPVDTestResult(bool osn)
     }
 }
 
+void MainWindow::slotGetMAGTestResult()
+{
+
+
+    quint8 data[17];
+    MBResult = 255;
+
+
+    MBTcp -> ReadDiscreteInputs(Block_Addr.MAG_ADDR, MAG_TEST_RESULT_ADDR_ALL, 17, data);
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        for (int i = 0; i < 16; i++)
+        {
+            MAGTRData[i] = data[i];
+        }
+        emit MAGTestResult(data[16], MAGTRData);
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+}
+
 void MainWindow::slotGetMSSTestResult(quint8 num)
 {
     quint8 data[5];
@@ -1340,7 +1476,7 @@ void MainWindow::slotGetMSSTestResult(quint8 num)
     }
 }
 
-void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
+void MainWindow::slotChangePVDWRegime(bool osn, quint8 status)
 {
 
     quint8 data[2];
@@ -1409,6 +1545,235 @@ void MainWindow::slotChangePVDStatus(bool osn, quint8 status)
     }
 }
 
+void MainWindow::slotChangeMAGWRegime(quint8 Status)
+{
+
+    quint8 data[2];
+
+
+    switch (Status) {
+
+    case 0:
+
+        data[0] = 0;
+        data[1] = 0;
+
+        break;
+
+    case 1:
+
+        data[0] = 0;
+        data[1] = 1;
+        break;
+
+    case 2:
+
+        data[0] = 1;
+        data[1] = 0;
+        break;
+
+    case 3:
+
+        data[0] = 1;
+        data[1] = 1;
+        break;
+
+    default:
+
+        data[0] = 0;
+        data[1] = 0;
+        break;
+    }
+
+    MBResult = 255;
+
+    MBTcp -> WriteMultipleCoils(Block_Addr.MAG_ADDR, MAG_REGIME_ADDR, 2, data);
+
+
+
+    while(MBResult == 255)
+    {
+       // qDebug() << MBResult;
+        QApplication::processEvents();
+
+    }
+
+
+
+    if (MBResult == 0)
+    {
+        emit ChangeMAGStatusOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+}
+
+/*
+ * Выбор источника синхронизации
+ * sour - источник
+ *
+ *          0 - не выдавать
+ *          1 - F-1, F5-1
+ *          2 - F-2, F5-2
+ */
+
+void MainWindow::slotSetSyncSource(quint8 sour)
+{
+
+    quint8 data[2];
+
+    switch (sour) {
+    case 0:
+
+        data[0] = 0;
+        data[1] = 0;
+        break;
+
+    case 1:
+
+        data[0] = 1;
+        data[1] = 0;
+        break;
+
+    case 2:
+
+        data[0] = 0;
+        data[1] = 1;
+        break;
+
+    default:
+
+        data[0] = 0;
+        data[1] = 0;
+
+        break;
+    }
+
+    MBResult = 255;
+
+    MBTcp -> WriteMultipleCoils(Block_Addr.MAG_ADDR, MAG_SYNC_SOURCE_ADDR, 2, data);
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        emit setMAGSyncSourceOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+
+}
+
+/*
+ *  Выбор магистрали
+ *
+ *  osn - true основная магистраль
+ *
+ */
+
+void MainWindow::slotMAGChannel(bool osn)
+{
+    quint8 ch;
+
+    ch = (osn == true) ? 0 : 1;
+
+    MBResult = 255;
+
+    MBTcp -> WriteCoil(Block_Addr.MAG_ADDR, MAG_CHANNEL_ADDR, ch);
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        emit MAGChannelChangeOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+
+
+}
+
+/*
+ * Выбор момента начала запроса информации
+ *  tack - 0 - F2 (по умолчанию)
+ *         1 - F3
+ *         2 - F4
+ *         3 - F5
+ */
+
+void MainWindow::slotSetSyncTack(quint8 tack)
+{
+    quint8 data[2];
+
+    switch (tack) {
+    case 0:
+        data[0] = 0;
+        data[1] = 0;
+        break;
+
+    case 1:
+        data[0] = 1;
+        data[1] = 0;
+        break;
+
+    case 2:
+        data[0] = 0;
+        data[1] = 1;
+        berak;
+
+    case 3:
+        data[0] = 1;
+        data[1] = 1;
+        break;
+
+    default:
+        data[0] = 0;
+        data[1] = 0;
+        break;
+    }
+
+    MBResult = 255;
+
+    MBTcp -> WriteMultipleCoils(Block_Addr.MAG_ADDR, MAG_SYNC_TACKT_ADDR, 2, data);
+
+    while (MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        emit setMAGSyncTacktOK();
+    } else
+    {
+        ErrorModBus(MBResult);
+    }
+}
+
+void MainWindow::slotSetMAGAddress(quint8 addr)
+{
+    // TODO Добавить чтение текущего рабочего режима блока МАГ, выключение и опять возврат к прочитанному
+
+
+    MBResult = 255;
+
+    MBTcp -> WriteHoldingRegister(Block_Addr.MAG_ADDR, MAG_ADDRESS_ADDR, addr);
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        emit setMAGAddressOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+}
+
 void MainWindow::slotSetMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bool ch4)
 {
     quint8 data[4];
@@ -1434,6 +1799,33 @@ void MainWindow::slotSetMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bo
     {
         emit ErrorModBus(MBResult);
     }
+}
+
+void MainWindow::slotSwitchMSS(quint8 numMSS, quint8 OsnRes)
+{
+
+    quint16 ch_addr[5] = {KOM_MSS_CHA_ADDR, KOM_MSS_CHB_ADDR, KOM_MSS_CHV_ADDR, KOM_MSS_CHG_ADDR, KOM_MSS_CHD_ADDR};
+    quint8 val[2] = {KOM_MSS_OSN, KOM_MSS_RES};
+
+    MBResult = 255;
+
+    MBTcp -> WriteCoil(Block_Addr.KOMMSS_ADDR, ch_addr[numMSS], val[OsnRes]);
+
+    while(MBResult == 255)
+    {
+        QApplication::processEvents();
+    }
+
+    if (MBResult == 0)
+    {
+        emit MSSSwitchOK();
+    } else
+    {
+        emit ErrorModBus(MBResult);
+    }
+
+
+
 }
 
 void MainWindow::slotModBusError(int err)
