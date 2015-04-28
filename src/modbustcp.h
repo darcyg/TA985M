@@ -50,10 +50,13 @@ signals:
 public slots:
 
     void Connect();
+    void DisConnect();
     void WriteHoldingRegister(quint16 slave, quint16 addr, quint16 value);
+    void WriteCoil(quint16 slave, quint16 addr, quint8 value);
     void WriteMultipleHoldingRegisters(quint16 slave, quint16 addr, quint16 num, quint16 *data);
     void WriteMultipleCoils(quint16 slave, quint16 addr, quint16 num, quint8 *data);
     void ReadInputRegisters(quint16 slave, quint16 addr, quint16 size, quint16 *data);
+    void ReadMultipleCoils(quint16 slave, quint16 addr, quint16 size, quint8 *data);
     void ReadDiscreteInputs(quint16 slave, quint16 addr, quint16 size, quint8 *data);
 
 

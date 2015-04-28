@@ -22,8 +22,29 @@ void ModBusTCP::Connect()
         if (modbus_connect(ctx) == -1)
         {
             qDebug() << "Connection failed: " << modbus_strerror(errno);
+            emit ModBusError(errno);
             return;
+        } else
+        {
+            emit ModBusOK();
         }
+    } else
+    {
+        emit ModBusError(254);
+    }
+
+}
+
+void ModBusTCP::DisConnect()
+{
+    if (ctx != NULL)
+    {
+        modbus_close(ctx);
+        emit ModBusOK();
+
+    } else
+    {
+        emit ModBusError(254);
     }
 
 }
@@ -74,6 +95,50 @@ void ModBusTCP::WriteHoldingRegister(quint16 slave, quint16 addr, quint16 value)
      emit ModBusOK();
 
 
+}
+
+void ModBusTCP::WriteCoil(quint16 slave, quint16 addr, quint8 value)
+{
+    quint16 repeat = NumberOfRepeat;
+
+    qDebug() << "Write Coil from slave: " << slave << " Addr: " << addr << " value: " << value;
+
+    while(repeat)
+    {
+        if (modbus_set_slave(ctx, slave) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error set slave: " << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    repeat = NumberOfRepeat;
+
+    while(repeat)
+    {
+        if (modbus_write_bit(ctx, addr, value) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error write coil: " << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    qDebug() << "Write OK" << repeat;
+    emit ModBusOK();
 }
 
 void ModBusTCP::WriteMultipleHoldingRegisters(quint16 slave, quint16 addr, quint16 num, quint16 *data)
@@ -215,6 +280,7 @@ void ModBusTCP::ReadInputRegisters(quint16 slave, quint16 addr, quint16 size, qu
 
     quint16 repeat = NumberOfRepeat;
 
+    qDebug() << "Read Input Registers from slave: " << slave << "Addr: " << addr << " number: " << size;
 
     while(repeat)
     {
@@ -256,10 +322,57 @@ void ModBusTCP::ReadInputRegisters(quint16 slave, quint16 addr, quint16 size, qu
 
 }
 
+void ModBusTCP::ReadMultipleCoils(quint16 slave, quint16 addr, quint16 size, quint8 *data)
+{
+
+    quint16 repeat = NumberOfRepeat;
+    qDebug() << "Read Multiple Coils from slave: " << slave << " Addr: " << addr << " number: " << size;
+
+    while(repeat)
+    {
+        if (modbus_set_slave(ctx, slave) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error set slave: " << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    repeat = NumberOfRepeat;
+
+    while(repeat)
+    {
+        if (modbus_read_bits(ctx, addr, size, data) == -1)
+        {
+            if (--repeat == 0)
+            {
+                qDebug() << "Error read Multiple Coils" << errno;
+                emit ModBusError(errno);
+                return;
+            }
+        } else
+        {
+            repeat = 0;
+        }
+    }
+
+    qDebug() << "Read OK" << repeat;
+    emit ModBusOK();
+}
+
 void ModBusTCP::ReadDiscreteInputs(quint16 slave, quint16 addr, quint16 size, quint8 *data)
 {
 
     quint16 repeat = NumberOfRepeat;
+
+    qDebug() << "Read Discrete Inputs from slave: " << slave << " Addr: " << addr << " number: " << size;
+
 
     while(repeat)
     {

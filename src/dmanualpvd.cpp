@@ -39,7 +39,7 @@ dManualPVD::dManualPVD(QWidget *parent) :
 void dManualPVD::slot_ChangeRegime(int reg)
 {
 
-    model -> setDataSize(SizeFromRegime[reg]);
+    model -> setDataSize(pSizeFromRegime[reg]);
     tbBD -> repaint();
 
     //TODO Add delete rows
@@ -51,10 +51,10 @@ void dManualPVD::slot_readPVD()
 
         noRead = true;
 
-    emit getPVDData(cbReadBD -> currentIndex(), cbReadLK -> currentIndex());
+    emit getPVDData(rbPVD_Osn -> isChecked(), cbReadBD -> currentIndex(), cbReadLK -> currentIndex());
 
 
-        model -> setDataSize(SizeFromRegime[cbReadRegim -> currentIndex()]);
+        model -> setDataSize(pSizeFromRegime[cbReadRegim -> currentIndex()]);
 
 
 
@@ -71,10 +71,14 @@ void dManualPVD::slot_readPVD()
     {
 
         qDebug() << "Read OK";
-        for (int i = 0; i < SizeFromRegime[cbReadRegim -> currentIndex()]; i++)
+        for (int i = 0; i < pSizeFromRegime[cbReadRegim -> currentIndex()]; i++)
         {
-            model -> BDData[i] = bd_data[i + AddrFromRegime[cbReadRegim -> currentIndex()]];
+            model -> BDData[i] = bd_data[i + pAddrFromRegime[cbReadRegim -> currentIndex()]];
         }
+    } else
+    {
+        for (int i = 0; i < 256; i++)
+            model -> BDData[i] = 255;
     }
 
 }
@@ -184,11 +188,11 @@ void dManualPVD::slot_GetTest()
         } else
         {
             qDebug() << "Test OK";
-            cbTestA -> setChecked(true);
-            cbTestB -> setChecked(true);
-            cbTestV -> setChecked(true);
-            cbTestG -> setChecked(true);
-            cbTestD -> setChecked(true);
+            cbTestA -> setChecked(false);
+            cbTestB -> setChecked(false);
+            cbTestV -> setChecked(false);
+            cbTestG -> setChecked(false);
+            cbTestD -> setChecked(false);
         }
 
 

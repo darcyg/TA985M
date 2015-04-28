@@ -19,6 +19,15 @@ void dSelfTest::stoppingCheck()
     while(!setOK & !setError)
         QApplication::processEvents();
 
+// -==== Off MAG ====-
+
+    emit setMAGStatus(0);
+
+    while(!setOK & !setError)
+        QApplication::processEvents();
+
+
+
 // -==== Off MSS11 ====-
 
     emit setMSSSelfTest(0, false, false, false, false);
@@ -572,16 +581,17 @@ void dSelfTest::OnTimeOut()
             break;
 
 // =========================================================================================================================================================
-            case SET_MAG1:
+        case SET_MAG1:
+
             qDebug() << "SET_MAG1";
 
             if (cbMAG1Test -> isChecked())
             {
 
-                wait_time = WAIT_TIME_FOR_SET_PVD;
+                wait_time = WAIT_TIME_FOR_SET_MAG;
                 setOK = false;
                 setError = false;
-               // emit setMAGStatus(true, 3);
+                emit setMAGStatus(3);
                 CheckStage = WAIT_FOR_SET_MAG1;
             } else
             {
@@ -589,7 +599,215 @@ void dSelfTest::OnTimeOut()
             }
 
             break;
-                break;
+
+        case WAIT_FOR_SET_MAG1:
+
+            qDebug() << "WAIT_FOR_SET_MAG1";
+
+            if (setOK)
+            {
+                qDebug() << "Set status OK";
+                CheckStage = CHEKING_MAG1;
+                check_time = sbCheckTime -> value();
+            } else
+            {
+                wait_time--;
+
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error set SelfTest MAG1";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МАГ (Режим1)"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMAG1Result, QString(tr("МАГ1")));
+                    stoppingCheck();
+                    break;
+                }
+
+
+            }
+
+            break;
+
+        case CHEKING_MAG1:
+
+            qDebug() << "CHEKING_MAG1: " << check_time ;
+
+            check_time--;
+            progressBar -> setValue(progressBar -> value() + 1);
+
+            if (check_time == 0)
+            {
+                wait_time = WAIT_TIME_FOR_GET_MAG_TEST;
+                setOK = false;
+                setError = false;
+                CheckStage = CHECK_MAG1;
+                emit getMAGTestResult();
+            }
+
+            break;
+
+
+        case CHECK_MAG1:
+
+
+            qDebug() << "CHECK_MAG1";
+
+            if (setOK)
+            {
+                qDebug() << "Get test MAG1 OK";
+                if (ALL_Result)
+                {
+
+
+                    ErrMes.setText(tr("Ошибка самоконтроля МАГ(Режим 1)"));
+                    ErrMes.setStandardButtons(QMessageBox::Ok);
+                    ErrString = tr("Ошибка проверки МАГ1 каналы: ");
+                    if (MAG_Result[0]) ErrString.append(tr("2рИ-8"));
+                    if (MAG_Result[1]) {
+                        if (MAG_Result[0])
+                            ErrString.append(tr(", 2рИ-7"));
+                        else
+                            ErrString.append(tr("2рИ-7"));
+                    }
+
+                    if (MAG_Result[2]) {
+                        if (MAG_Result[0] | MAG_Result[1])
+                            ErrString.append(tr(", 2рИ-6"));
+                        else
+                            ErrString.append(tr("2рИ-6"));
+                    }
+
+                    if (MAG_Result[3]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2])
+                            ErrString.append(tr(", 2рИ-5"));
+                        else
+                            ErrString.append(tr("2рИ-5"));
+                    }
+
+                    if (MAG_Result[4]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3])
+                            ErrString.append(tr(", 2рИ-4"));
+                        else
+                            ErrString.append(tr("2рИ-4"));
+                    }
+
+                    if (MAG_Result[5]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4])
+                            ErrString.append(tr(", 2рИ-3"));
+                        else
+                            ErrString.append(tr("2рИ-3"));
+                    }
+
+                    if (MAG_Result[6]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] | MAG_Result[5])
+                            ErrString.append(tr(", 2рИ-2"));
+                        else
+                            ErrString.append(tr("2рИ-2"));
+                    }
+
+                    if (MAG_Result[7]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                                MAG_Result[5] | MAG_Result[6])
+                            ErrString.append(tr(", 2рИ-1"));
+                        else
+                            ErrString.append(tr("2рИ-1"));
+                    }
+
+                    if (MAG_Result[8]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                                MAG_Result[5] | MAG_Result[6] | MAG_Result[7])
+                            ErrString.append(tr(", 1рИ-8"));
+                        else
+                            ErrString.append(tr("1рИ-8"));
+                    }
+
+                    if (MAG_Result[9]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                                MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8])
+                            ErrString.append(tr(", 1рИ-7"));
+                        else
+                            ErrString.append(tr("1рИ-7"));
+                    }
+
+                    if (MAG_Result[10]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                                MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9])
+                            ErrString.append(tr(", 1рИ-6"));
+                        else
+                            ErrString.append(tr("1рИ-6"));
+                    }
+
+                    if (MAG_Result[11]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                            MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9] |
+                            MAG_Result[10])
+                            ErrString.append(tr(", 1рИ-5"));
+                        else
+                            ErrString.append(tr("1рИ-5"));
+                    }
+
+                    if (MAG_Result[12]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                            MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9] |
+                            MAG_Result[10] | MAG_Result[11])
+                            ErrString.append(tr(", 1рИ-4"));
+                        else
+                            ErrString.append(tr("1рИ-4"));
+                    }
+
+                    if (MAG_Result[13]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                            MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9] |
+                            MAG_Result[10] | MAG_Result[11] | MAG_Result[12])
+                            ErrString.append(tr(", 1рИ-3"));
+                        else
+                            ErrString.append(tr("1рИ-3"));
+                    }
+
+                    if (MAG_Result[14]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                            MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9] |
+                                MAG_Result[10] | MAG_Result[11] | MAG_Result[12] | MAG_Result[13])
+                            ErrString.append(tr(", 1рИ-2"));
+                        else
+                            ErrString.append(tr("1рИ-2"));
+                    }
+
+                    if (MAG_Result[15]){
+                        if (MAG_Result[0] | MAG_Result[1] | MAG_Result[2] | MAG_Result[3] | MAG_Result[4] |
+                            MAG_Result[5] | MAG_Result[6] | MAG_Result[7] | MAG_Result[8] | MAG_Result[9] |
+                                MAG_Result[10] | MAG_Result[11] | MAG_Result[12] | MAG_Result[13] | MAG_Result[14])
+                            ErrString.append(tr(", 1рИ-1"));
+                        else
+                            ErrString.append(tr("1рИ-1"));
+                    }
+
+                    ErrMes.setDetailedText(ErrString);
+
+                    ErrMes.exec();
+                    SET_LABEL_RED_TEXT(lMAG1Result, QString(tr("МАГ1")));
+                    stoppingCheck();
+
+
+                } else
+                {
+                    qDebug() << "SelfTest MAG1 OK";
+                    SET_LABEL_GREEN_TEXT(lMAG1Result, QString(tr("МАГ1")));
+                    CheckStage = SET_MAG2;
+
+                }
+            } else
+            {
+                wait_time--;
+                if (setError | (wait_time == 0))
+                {
+                    qDebug() << "Error receive SelfTest data for MAG1";
+                    QMessageBox::critical(this, tr("Самоконтроль"), tr("Ошибка самоконтроля блока МАГ (Режим 1)"), QMessageBox::Ok);
+                    SET_LABEL_RED_TEXT(lMAG1Result, QString(tr("МАГ1")));
+                    stoppingCheck();
+                }
+            }
+
+            break;
 
 // =========================================================================================================================================================
 
@@ -1290,6 +1508,12 @@ void dSelfTest::slotChangePVDStatusOK()
     setError = false;
 }
 
+void dSelfTest::slotChangeMAGStatusOK()
+{
+    setOK = true;
+    setError = false;
+}
+
 void dSelfTest::slotChangeMSSSelfTestSetOK()
 {
     setOK = true;
@@ -1317,6 +1541,24 @@ void dSelfTest::slotPVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, 
     PVDD_Result = PVD_D;
 
 }
+
+void dSelfTest::slotMAGTestResult(bool All, bool *data)
+{
+
+    qDebug() << Q_FUNC_INFO;
+    setOK = true;
+    setError = false;
+
+    ALL_Result = All;
+
+    for (int i = 0; i < 16; i++)
+    {
+        MAG_Result[i] = data[i];
+        qDebug() << MAG_Result[i];
+    }
+}
+
+
 
 void dSelfTest::slotMSSTestResult(bool All, bool ch1, bool ch2, bool ch3, bool ch4)
 {

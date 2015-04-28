@@ -19,8 +19,8 @@ class dManuaMAG : public QDialog, private Ui::dManuaMAG
 
 private:
 
-    bool noRead;
-    bool ReadError;
+    quint8 MBResult;
+    int last_Status;
 
 
 
@@ -41,7 +41,13 @@ public slots:
     void slot_ErrorModBus(quint8 err);
 
 
+    void slot_ChangeStatus(int status);
+    void slot_MAGChangeStatusOK();
+
 signals:
+
+    void ChangeStatus(quint8 status);
+    void getMAGData(quint8 numMSS);
 
 
 };

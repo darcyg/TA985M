@@ -31,6 +31,15 @@
 #define PVD_REGIME_ADDR         5
 #define PVD_TEST_RESULT_ADDR_ALL 0
 
+
+#define MAG_TEST_RESULT_ADDR_ALL 0
+#define MAG_REGIME_ADDR          0
+#define MAG_SYNC_SOURCE_ADDR     2
+#define MAG_CHANNEL_ADDR         4
+#define MAG_SYNC_TACKT_ADDR      5
+#define MAG_ADDRESS_ADDR         0
+
+
 #define MSS_CHANAL1_ADDR        0
 #define MSS_CHANAL2_ADDR        0
 #define MSS_CHANAL3_ADDR        0
@@ -42,6 +51,14 @@
 
 #define MSS_BLOCK_WRITE         128
 
+#define KOM_MSS_CHA_ADDR        0
+#define KOM_MSS_CHB_ADDR        1
+#define KOM_MSS_CHV_ADDR        2
+#define KOM_MSS_CHG_ADDR        3
+#define KOM_MSS_CHD_ADDR        4
+
+#define KOM_MSS_OSN             0
+#define KOM_MSS_RES             1
 
 
 

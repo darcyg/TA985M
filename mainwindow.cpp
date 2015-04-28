@@ -51,7 +51,7 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
 
     // Загружаем МСС1
     if (regim1) {
-        mss_file -> setFileName(mssfilePath + MSSFileName[regim1]);
+        mss_file -> setFileName(mssfilePath + MSSFileName[bd_num][regim1]);
 
 
 
@@ -88,7 +88,7 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
 
     // Загружаем МСС2
     if (regim2) {
-        mss_file -> setFileName(mssfilePath + MSSFileName[regim2]);
+        mss_file -> setFileName(mssfilePath + MSSFileName[bd_num][regim2]);
         //mss_file -> setFileName("test.mss");
 
         qDebug() << "Load file to MSS2: " << mss_file -> fileName();
@@ -122,7 +122,7 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
 
     // Загружаем МСС3
     if (regim3) {
-        mss_file -> setFileName(mssfilePath + MSSFileName[regim3]);
+        mss_file -> setFileName(mssfilePath + MSSFileName[bd_num][regim3]);
         //mss_file -> setFileName("test.mss");
 
         qDebug() << "Load file to MSS3: " << mss_file -> fileName();
@@ -156,7 +156,7 @@ void MainWindow::MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 reg
     // Загружаем МСС4
     if (regim4) {
 
-        mss_file -> setFileName(mssfilePath + MSSFileName[regim4]);
+        mss_file -> setFileName(mssfilePath + MSSFileName[bd_num][regim4]);
         //mss_file -> setFileName("test.mss");
 
         qDebug() << "Load file to MSS4: " << mss_file -> fileName();
@@ -530,15 +530,56 @@ void MainWindow::WriteSettings()
 
 void MainWindow::ReadRegimSettings(int regim)
 {
+
+    QSettings setupFile(QApplication::applicationDirPath() + "/" + QApplication::applicationName() + ".ini", QSettings::IniFormat);
+    setupFile.setIniCodec("UTF-8");
+
+
+    setupFile.beginGroup("SOFT_REGIME");
+        SoftRegimFileName = setupFile.value(QString("Regim%1_file").arg(regim), "").toString();
+    setupFile.endGroup();
+
     QSettings regimSettingsFile(QApplication::applicationDirPath() + "/Config/" + SoftRegimFileName + ".ini", QSettings::IniFormat);
 
     qDebug() << Q_FUNC_INFO << regimSettingsFile.fileName();
 
-    regimSettingsFile.beginGroup("MSS_FILE");
+    regimSettingsFile.beginGroup("MSS1_FILE");
 
-     MSSFileName[1] = regimSettingsFile.value("Regim1", "").toString();
-     MSSFileName[2] = regimSettingsFile.value("Regim2", "").toString();
-     MSSFileName[3] = regimSettingsFile.value("Regim3", "").toString();
+     MSSFileName[0][1] = regimSettingsFile.value("Regim1", "").toString();
+     MSSFileName[0][2] = regimSettingsFile.value("Regim2", "").toString();
+     MSSFileName[0][3] = regimSettingsFile.value("Regim3", "").toString();
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS2_FILE");
+
+     MSSFileName[1][1] = regimSettingsFile.value("Regim1", "").toString();
+     MSSFileName[1][2] = regimSettingsFile.value("Regim2", "").toString();
+     MSSFileName[1][3] = regimSettingsFile.value("Regim3", "").toString();
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS3_FILE");
+
+     MSSFileName[2][1] = regimSettingsFile.value("Regim1", "").toString();
+     MSSFileName[2][2] = regimSettingsFile.value("Regim2", "").toString();
+     MSSFileName[2][3] = regimSettingsFile.value("Regim3", "").toString();
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS4_FILE");
+
+     MSSFileName[3][1] = regimSettingsFile.value("Regim1", "").toString();
+     MSSFileName[3][2] = regimSettingsFile.value("Regim2", "").toString();
+     MSSFileName[3][3] = regimSettingsFile.value("Regim3", "").toString();
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS5_FILE");
+
+     MSSFileName[4][1] = regimSettingsFile.value("Regim1", "").toString();
+     MSSFileName[4][2] = regimSettingsFile.value("Regim2", "").toString();
+     MSSFileName[4][3] = regimSettingsFile.value("Regim3", "").toString();
 
     regimSettingsFile.endGroup();
 
@@ -555,17 +596,161 @@ void MainWindow::ReadRegimSettings(int regim)
      currentRegim[2][4] = regimSettingsFile.value("BDD_LK3", 0).toInt();
      currentRegim[3][4] = regimSettingsFile.value("BDD_LK4", 0).toInt();
 
-     BDG_LK1 -> setEnabled(regimSettingsFile.value("BDG_LK1_EN", true).toBool());
-     BDG_LK2 -> setEnabled(regimSettingsFile.value("BDG_LK2_EN", true).toBool());
-     BDG_LK3 -> setEnabled(regimSettingsFile.value("BDG_LK3_EN", true).toBool());
-     BDG_LK4 -> setEnabled(regimSettingsFile.value("BDG_LK4_EN", true).toBool());
+     regimSettingsFile.endGroup();
 
-     BDD_LK1 -> setEnabled(regimSettingsFile.value("BDD_LK1_EN", true).toBool());
-     BDD_LK2 -> setEnabled(regimSettingsFile.value("BDD_LK2_EN", true).toBool());
-     BDD_LK3 -> setEnabled(regimSettingsFile.value("BDD_LK3_EN", true).toBool());
-     BDD_LK4 -> setEnabled(regimSettingsFile.value("BDD_LK4_EN", true).toBool());
+     regimSettingsFile.beginGroup("Control");
+
+     ControlEnable.BDG_LK1 = regimSettingsFile.value("BDG_LK1_EN", true).toBool();
+     ControlEnable.BDG_LK2 = regimSettingsFile.value("BDG_LK1_EN", true).toBool();
+     ControlEnable.BDG_LK3 = regimSettingsFile.value("BDG_LK1_EN", true).toBool();
+     ControlEnable.BDG_LK4 = regimSettingsFile.value("BDG_LK1_EN", true).toBool();
+
+     ControlEnable.BDD_LK1 = regimSettingsFile.value("BDD_LK1_EN", true).toBool();
+     ControlEnable.BDD_LK2 = regimSettingsFile.value("BDD_LK1_EN", true).toBool();
+     ControlEnable.BDD_LK3 = regimSettingsFile.value("BDD_LK1_EN", true).toBool();
+     ControlEnable.BDD_LK4 = regimSettingsFile.value("BDD_LK1_EN", true).toBool();
+
+     ControlEnable.SelfTest1 = regimSettingsFile.value("SelfTest1", true).toBool();
+     ControlEnable.SelfTest2 = regimSettingsFile.value("SelfTest2", true).toBool();
+
+     ControlEnable.LoadMSSA = regimSettingsFile.value("ManualLoadMSS_A", true).toBool();
+     ControlEnable.LoadMSSB = regimSettingsFile.value("ManualLoadMSS_B", true).toBool();
+     ControlEnable.LoadMSSV = regimSettingsFile.value("ManualLoadMSS_V", true).toBool();
+     ControlEnable.LoadMSSG = regimSettingsFile.value("ManualLoadMSS_G", true).toBool();
+     ControlEnable.LoadMSSD = regimSettingsFile.value("ManualLoadMSS_D", true).toBool();
+
+     ControlEnable.MAGAddr_A = regimSettingsFile.value("MAGAddr_A", true).toBool();
+     ControlEnable.MAGAddr_B = regimSettingsFile.value("MAGAddr_B", true).toBool();
+     ControlEnable.MAGAddr_V = regimSettingsFile.value("MAGAddr_V", true).toBool();
+     ControlEnable.MAGAddr_G = regimSettingsFile.value("MAGAddr_G", true).toBool();
+     ControlEnable.MAGAddr_D = regimSettingsFile.value("MAGAddr_D", true).toBool();
+     ControlEnable.BDG_Addr = regimSettingsFile.value("BDG_Addr", true).toBool();
+     ControlEnable.BDD_Addr = regimSettingsFile.value("BDD_Addr", true).toBool();
+
+     ControlEnable.CheckAll = regimSettingsFile.value("CheckAll", true).toBool();
+     ControlEnable.NumberOfRepeat = regimSettingsFile.value("NumberOfRepeat", true).toBool();
+
+     ControlEnable.Sync = regimSettingsFile.value("Sync", true).toBool();
+     ControlEnable.MAG = regimSettingsFile.value("MAG", true).toBool();
+     ControlEnable.PVD = regimSettingsFile.value("PVD", true).toBool();
+     ControlEnable.MSS = regimSettingsFile.value("MSS", true).toBool();
+
+     ControlEnable.CheckPVD = regimSettingsFile.value("CheckPVD", true).toBool();
+     ControlEnable.CheckMAG = regimSettingsFile.value("CheckMAG", true).toBool();
+
+
+
+
+
 
     regimSettingsFile.endGroup();
+
+
+    lMSS1_A -> setText(MSSFileName[0][currentRegim[0][0]]);
+    lMSS2_A -> setText(MSSFileName[0][currentRegim[1][0]]);
+    lMSS3_A -> setText(MSSFileName[0][currentRegim[2][0]]);
+    lMSS4_A -> setText(MSSFileName[0][currentRegim[3][0]]);
+
+    lMSS1_B -> setText(MSSFileName[1][currentRegim[0][1]]);
+    lMSS2_B -> setText(MSSFileName[1][currentRegim[1][1]]);
+    lMSS3_B -> setText(MSSFileName[1][currentRegim[2][1]]);
+    lMSS4_B -> setText(MSSFileName[1][currentRegim[3][1]]);
+
+    lMSS1_V -> setText(MSSFileName[2][currentRegim[0][2]]);
+    lMSS2_V -> setText(MSSFileName[2][currentRegim[1][2]]);
+    lMSS3_V -> setText(MSSFileName[2][currentRegim[2][2]]);
+    lMSS4_V -> setText(MSSFileName[2][currentRegim[3][2]]);
+
+    lMSS1_G -> setText(MSSFileName[3][currentRegim[0][3]]);
+    lMSS2_G -> setText(MSSFileName[3][currentRegim[1][3]]);
+    lMSS3_G -> setText(MSSFileName[3][currentRegim[2][3]]);
+    lMSS4_G -> setText(MSSFileName[3][currentRegim[3][3]]);
+
+    lMSS1_D -> setText(MSSFileName[4][currentRegim[0][4]]);
+    lMSS2_D -> setText(MSSFileName[4][currentRegim[1][4]]);
+    lMSS3_D -> setText(MSSFileName[4][currentRegim[2][4]]);
+    lMSS4_D -> setText(MSSFileName[4][currentRegim[3][4]]);
+
+
+    cbAllCheck -> setEnabled(ControlEnable.CheckAll);
+  //  cbAllCheck -> setDisabled(!ControlEnable.CheckAll);
+    sbNumCheck -> setEnabled(ControlEnable.NumberOfRepeat);
+
+    rbSync0 -> setEnabled(ControlEnable.Sync);
+    rbSync1 -> setEnabled(ControlEnable.Sync);
+    rbSync2 -> setEnabled(ControlEnable.Sync);
+
+    rbMAG0 -> setEnabled(ControlEnable.MAG);
+    rbMAG1 -> setEnabled(ControlEnable.MAG);
+    rbMAG2 -> setEnabled(ControlEnable.MAG);
+
+    rbPVD0 -> setEnabled(ControlEnable.PVD);
+    rbPVD1 -> setEnabled(ControlEnable.PVD);
+    rbPVD2 -> setEnabled(ControlEnable.PVD);
+
+    rbMSS0 -> setEnabled(ControlEnable.MSS);
+    rbMSS1 -> setEnabled(ControlEnable.MSS);
+    rbMSS2 -> setEnabled(ControlEnable.MSS);
+
+    if (isConnected)
+    {
+        pbSelfTest1 -> setEnabled(ControlEnable.SelfTest1);
+        pbSelfTest2 -> setEnabled(ControlEnable.SelfTest2);
+
+        pbLOadMSS_A -> setEnabled(ControlEnable.LoadMSSA);
+        pbLOadMSS_B -> setEnabled(ControlEnable.LoadMSSB);
+        pbLOadMSS_V -> setEnabled(ControlEnable.LoadMSSV);
+        pbLOadMSS_G -> setEnabled(ControlEnable.LoadMSSG);
+        pbLOadMSS_D -> setEnabled(ControlEnable.LoadMSSD);
+
+        MAGA_ADDR -> setEnabled(ControlEnable.MAGAddr_A);
+        pbMAGAddronDeviceA -> setEnabled(ControlEnable.MAGAddr_A);
+        MAGB_ADDR -> setEnabled(ControlEnable.MAGAddr_B);
+        pbMAGAddrOnDeviceB -> setEnabled(ControlEnable.MAGAddr_B);
+        MAGV_ADDR -> setEnabled(ControlEnable.MAGAddr_V);
+        pbMAGAddrOnDeviceV -> setEnabled(ControlEnable.MAGAddr_V);
+        MAGG_ADDR -> setEnabled(ControlEnable.MAGAddr_G);
+        pbMAGAddrOnDeviceG -> setEnabled(ControlEnable.MAGAddr_G);
+        MAGD_ADDR -> setEnabled(ControlEnable.MAGAddr_D);
+        pbMAGAddrOnDeviceD -> setEnabled(ControlEnable.MAGAddr_D);
+
+        BDG_ADDR -> setEnabled(ControlEnable.BDG_Addr);
+        pbMAGAddrOnMAGG -> setEnabled(ControlEnable.BDG_Addr);
+        BDD_ADDR -> setEnabled(ControlEnable.BDD_Addr);
+        pbMAGAddrOnMAGD -> setEnabled(ControlEnable.BDD_Addr);
+
+        pbCheckPVD -> setEnabled(ControlEnable.CheckPVD);
+        pbCheckMAG -> setEnabled(ControlEnable.CheckMAG);
+
+    }
+
+    pbSelfTest1 -> setDisabled(!ControlEnable.SelfTest1);
+    pbSelfTest2 -> setDisabled(!ControlEnable.SelfTest2);
+
+    pbLOadMSS_A -> setDisabled(!ControlEnable.LoadMSSA);
+    pbLOadMSS_B -> setDisabled(!ControlEnable.LoadMSSB);
+    pbLOadMSS_V -> setDisabled(!ControlEnable.LoadMSSV);
+    pbLOadMSS_G -> setDisabled(!ControlEnable.LoadMSSG);
+    pbLOadMSS_D -> setDisabled(!ControlEnable.LoadMSSD);
+
+    MAGA_ADDR -> setDisabled(!ControlEnable.MAGAddr_A);
+    pbMAGAddronDeviceA -> setDisabled(!ControlEnable.MAGAddr_A);
+    MAGB_ADDR -> setDisabled(!ControlEnable.MAGAddr_B);
+    pbMAGAddrOnDeviceB -> setDisabled(!ControlEnable.MAGAddr_B);
+    MAGV_ADDR -> setDisabled(!ControlEnable.MAGAddr_V);
+    pbMAGAddrOnDeviceV -> setDisabled(!ControlEnable.MAGAddr_V);
+    MAGG_ADDR -> setDisabled(!ControlEnable.MAGAddr_G);
+    pbMAGAddrOnDeviceG -> setDisabled(!ControlEnable.MAGAddr_G);
+    MAGD_ADDR -> setDisabled(!ControlEnable.MAGAddr_D);
+    pbMAGAddrOnDeviceD -> setDisabled(!ControlEnable.MAGAddr_D);
+
+    BDG_ADDR -> setDisabled(!ControlEnable.BDG_Addr);
+    pbMAGAddrOnMAGG -> setDisabled(!ControlEnable.BDG_Addr);
+    BDD_ADDR -> setDisabled(!ControlEnable.BDD_Addr);
+    pbMAGAddrOnMAGD -> setDisabled(!ControlEnable.BDD_Addr);
+
+    pbCheckPVD -> setDisabled(!ControlEnable.CheckPVD);
+    pbCheckMAG -> setDisabled(!ControlEnable.CheckMAG);
 
 
 }
@@ -583,13 +768,47 @@ void MainWindow::WriteRegimSettings(int regim)
 
     qDebug() << Q_FUNC_INFO << regimSettingsFile.fileName();
 
-    regimSettingsFile.beginGroup("MSS_FILE");
+    regimSettingsFile.beginGroup("MSS1_FILE");
 
-     regimSettingsFile.setValue("Regim1", MSSFileName[1]);
-     regimSettingsFile.setValue("Regim2", MSSFileName[2]);
-     regimSettingsFile.setValue("Regim3", MSSFileName[3]);
+     regimSettingsFile.setValue("Regim1", MSSFileName[0][1]);
+     regimSettingsFile.setValue("Regim2", MSSFileName[0][2]);
+     regimSettingsFile.setValue("Regim3", MSSFileName[0][3]);
 
     regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS2_FILE");
+
+     regimSettingsFile.setValue("Regim1", MSSFileName[1][1]);
+     regimSettingsFile.setValue("Regim2", MSSFileName[1][2]);
+     regimSettingsFile.setValue("Regim3", MSSFileName[1][3]);
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS3_FILE");
+
+     regimSettingsFile.setValue("Regim1", MSSFileName[2][1]);
+     regimSettingsFile.setValue("Regim2", MSSFileName[2][2]);
+     regimSettingsFile.setValue("Regim3", MSSFileName[2][3]);
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS4_FILE");
+
+     regimSettingsFile.setValue("Regim1", MSSFileName[3][1]);
+     regimSettingsFile.setValue("Regim2", MSSFileName[3][2]);
+     regimSettingsFile.setValue("Regim3", MSSFileName[3][3]);
+
+    regimSettingsFile.endGroup();
+
+    regimSettingsFile.beginGroup("MSS5_FILE");
+
+     regimSettingsFile.setValue("Regim1", MSSFileName[4][1]);
+     regimSettingsFile.setValue("Regim2", MSSFileName[4][2]);
+     regimSettingsFile.setValue("Regim3", MSSFileName[4][3]);
+
+    regimSettingsFile.endGroup();
+
+
 
 
     regimSettingsFile.beginGroup("Regim_LK");
@@ -604,6 +823,10 @@ void MainWindow::WriteRegimSettings(int regim)
      regimSettingsFile.setValue("BDD_LK3", currentRegim[2][4]);
      regimSettingsFile.setValue("BDD_LK4", currentRegim[3][4]);
 
+     regimSettingsFile.endGroup();
+
+     regimSettingsFile.beginGroup("Control");
+
      regimSettingsFile.setValue("BDG_LK1_EN", BDG_LK1 -> isEnabled());
      regimSettingsFile.setValue("BDG_LK2_EN", BDG_LK2 -> isEnabled());
      regimSettingsFile.setValue("BDG_LK3_EN", BDG_LK3 -> isEnabled());
@@ -614,7 +837,106 @@ void MainWindow::WriteRegimSettings(int regim)
      regimSettingsFile.setValue("BDD_LK3_EN", BDD_LK3 -> isEnabled());
      regimSettingsFile.setValue("BDD_LK4_EN", BDD_LK4 -> isEnabled());
 
+// TODO Добавить остальное
+
      regimSettingsFile.endGroup();
+
+}
+
+void MainWindow::EnableControl()
+{
+    pbConnect -> setDisabled(true);
+    pbDisConnect -> setEnabled(true);
+    pbReportSlave ->setEnabled(true);
+
+
+    BDG_LK1 -> setEnabled(ControlEnable.BDG_LK1);
+    BDG_LK2 -> setEnabled(ControlEnable.BDG_LK2);
+    BDG_LK3 -> setEnabled(ControlEnable.BDG_LK3);
+    BDG_LK4 -> setEnabled(ControlEnable.BDG_LK4);
+
+    BDD_LK1 -> setEnabled(ControlEnable.BDD_LK1);
+    BDD_LK2 -> setEnabled(ControlEnable.BDD_LK2);
+    BDD_LK3 -> setEnabled(ControlEnable.BDD_LK3);
+    BDD_LK4 -> setEnabled(ControlEnable.BDD_LK4);
+
+    pbSelfTest1 -> setEnabled(ControlEnable.SelfTest1);
+    pbSelfTest2 -> setEnabled(ControlEnable.SelfTest2);
+
+    pbLOadMSS_A -> setEnabled(ControlEnable.LoadMSSA);
+    pbLOadMSS_B -> setEnabled(ControlEnable.LoadMSSB);
+    pbLOadMSS_V -> setEnabled(ControlEnable.LoadMSSV);
+    pbLOadMSS_G -> setEnabled(ControlEnable.LoadMSSG);
+    pbLOadMSS_D -> setEnabled(ControlEnable.LoadMSSD);
+
+    MAGA_ADDR -> setEnabled(ControlEnable.MAGAddr_A);
+    pbMAGAddronDeviceA -> setEnabled(ControlEnable.MAGAddr_A);
+    MAGB_ADDR -> setEnabled(ControlEnable.MAGAddr_B);
+    pbMAGAddrOnDeviceB -> setEnabled(ControlEnable.MAGAddr_B);
+    MAGV_ADDR -> setEnabled(ControlEnable.MAGAddr_V);
+    pbMAGAddrOnDeviceV -> setEnabled(ControlEnable.MAGAddr_V);
+    MAGG_ADDR -> setEnabled(ControlEnable.MAGAddr_G);
+    pbMAGAddrOnDeviceG -> setEnabled(ControlEnable.MAGAddr_G);
+    MAGD_ADDR -> setEnabled(ControlEnable.MAGAddr_D);
+    pbMAGAddrOnDeviceD -> setEnabled(ControlEnable.MAGAddr_D);
+    \
+    BDG_ADDR -> setEnabled(ControlEnable.BDG_Addr);
+    pbMAGAddrOnMAGG -> setEnabled(ControlEnable.BDG_Addr);
+    BDD_ADDR -> setEnabled(ControlEnable.BDD_Addr);
+    pbMAGAddrOnMAGD -> setEnabled(ControlEnable.BDD_Addr);
+
+    pbCheckPVD -> setEnabled(ControlEnable.CheckPVD);
+    pbCheckMAG -> setEnabled(ControlEnable.CheckMAG);
+
+
+}
+
+void MainWindow::DisableControl()
+{
+    pbConnect -> setEnabled(true);
+    pbDisConnect -> setDisabled(true);
+    pbReportSlave -> setDisabled(true);
+
+    BDG_LK1 -> setDisabled(true);
+    BDG_LK2 -> setDisabled(true);
+    BDG_LK3 -> setDisabled(true);
+    BDG_LK4 -> setDisabled(true);
+
+    BDD_LK1 -> setDisabled(true);
+    BDD_LK2 -> setDisabled(true);
+    BDD_LK3 -> setDisabled(true);
+    BDD_LK4 -> setDisabled(true);
+
+    pbSelfTest1 -> setDisabled(true);
+    pbSelfTest2 -> setDisabled(true);
+
+    pbLOadMSS_A -> setDisabled(true);
+    pbLOadMSS_B -> setDisabled(true);
+    pbLOadMSS_V -> setDisabled(true);
+    pbLOadMSS_G -> setDisabled(true);
+    pbLOadMSS_D -> setDisabled(true);
+
+    MAGA_ADDR -> setDisabled(true);
+    pbMAGAddronDeviceA -> setDisabled(true);
+    MAGB_ADDR -> setDisabled(true);
+    pbMAGAddrOnDeviceB -> setDisabled(true);
+    MAGV_ADDR -> setDisabled(true);
+    pbMAGAddrOnDeviceV -> setDisabled(true);
+    MAGG_ADDR -> setDisabled(true);
+    pbMAGAddrOnDeviceG -> setDisabled(true);
+    MAGD_ADDR -> setDisabled(true);
+    pbMAGAddrOnDeviceD -> setDisabled(true);
+
+    BDG_ADDR -> setDisabled(true);
+    pbMAGAddrOnMAGG -> setDisabled(true);
+    BDD_ADDR -> setDisabled(true);
+    pbMAGAddrOnMAGD -> setDisabled(true);
+
+
+    pbCheckPVD -> setDisabled(true);
+    pbCheckMAG -> setDisabled(true);
+
+
 
 }
 
@@ -626,25 +948,12 @@ void MainWindow::WriteRegimSettings(int regim)
  */
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+    QMainWindow(parent),
+    isConnected(false)
 {
     setupUi(this);
 
 
-
-    logModel = new QStandardItemModel(1, 2, this);
-    logModel -> setHorizontalHeaderLabels(QStringList() << "Type" << "Message");
-
-
-    logTableView -> setModel(logModel);
-
-    logTableView -> setAlternatingRowColors(true);
-    logTableView -> setEditTriggers(QAbstractItemView::NoEditTriggers);
-    logTableView -> setGridStyle(Qt::NoPen);
-    logTableView -> verticalHeader() -> hide();
-    logTableView -> horizontalHeader() -> setStretchLastSection(true);
-  //  logTableView -> resizeRowToContents();
-    logTableView -> setWordWrap(false);
 
     secretMenu = new QMenu("Secret menu");
 
@@ -731,8 +1040,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(BDG_LK4, SIGNAL(currentIndexChanged(int)),
             this, SLOT(changeBDGLK4(int)));
 
-    connect(pbLoadMSS, SIGNAL(clicked()),
-            this, SLOT(ManualLoadMSS()));
+//    connect(pbLoadMSS, SIGNAL(clicked()),
+//            this, SLOT(ManualLoadMSS()));
 
 
 
@@ -780,6 +1089,7 @@ MainWindow::MainWindow(QWidget *parent) :
     setupFile.endGroup();
 
 
+
     ReadSettings();
     ReadRegimSettings(CurrentSoftRegimeNumber);
 
@@ -815,11 +1125,27 @@ MainWindow::MainWindow(QWidget *parent) :
 //            this, SLOT(slotStartCheck()));
 
 
-    MSSFile[0] = NULL;
-    MSSFile[1] = cbMSSRegim1;
-    MSSFile[2] = cbMSSRegim2;
-    MSSFile[3] = cbMSSRegim3;
+    SyncGroup = new QButtonGroup(this);
+    MAGGroup = new QButtonGroup(this);
+    PVDGroup = new QButtonGroup(this);
+    MSSGroup = new QButtonGroup(this);
 
+
+    SyncGroup -> addButton(rbSync0, 0);
+    SyncGroup -> addButton(rbSync1, 1);
+    SyncGroup -> addButton(rbSync2, 2);
+
+    MAGGroup -> addButton(rbMAG0, 0);
+    MAGGroup -> addButton(rbMAG1, 1);
+    MAGGroup -> addButton(rbMAG2, 2);
+
+    PVDGroup -> addButton(rbPVD0, 0);
+    PVDGroup -> addButton(rbPVD1, 1);
+    PVDGroup -> addButton(rbPVD2, 2);
+
+    MSSGroup -> addButton(rbMSS0, 0);
+    MSSGroup -> addButton(rbMSS1, 1);
+    MSSGroup -> addButton(rbMSS2, 2);
 
 
 }
@@ -1003,8 +1329,8 @@ void MainWindow::slotManulMSS()
 {
     dManualLoadMSS manWin;
 
-    for(int i = 0; i < 5; i++)
-        manWin.slaveAddr[i] = MSS_Addr[i];
+//    for(int i = 0; i < 5; i++)
+//        manWin.slaveAddr[i] = MSS_Addr[i];
 
 
     connect(&manWin, SIGNAL(wrMultipleCoils(quint16,quint16,quint16,quint8*)),
@@ -1026,6 +1352,9 @@ void MainWindow::slotSetMSSFileName()
 
 void MainWindow::slotManualPVD()
 {
+
+    CHECK_CONNECT();
+
     dManualPVD dialog;
 
 
@@ -1049,6 +1378,10 @@ void MainWindow::slotManualPVD()
 
 void MainWindow::slotManualMAG()
 {
+
+    CHECK_CONNECT();
+
+
     dManuaMAG dialog;
 
     connect(&dialog, SIGNAL(ChangeStatus(quint8)), this, SLOT(slotChangeMAGWRegime(quint8)));
@@ -1064,6 +1397,9 @@ void MainWindow::slotManualMAG()
 
 void MainWindow::slotManualKomMSS()
 {
+
+     CHECK_CONNECT();
+
 
     dManualKomMSS dialog;
 
@@ -1099,17 +1435,43 @@ void MainWindow::slotConnect()
 {
     qDebug() << "Connect to IP";
 
+
+    MBResult = 255;
+
     MBTcp -> Connect();
 
-    if (true)
+    while (MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
     {
-        pbConnect -> setDisabled(true);
-        pbDisConnect -> setEnabled(true);
+       isConnected = true;
+       EnableControl();
+    } else
+    {
+        QMessageBox::critical(this, "TK168", tr("Ошибка соединения с пультом TK168"), QMessageBox::Ok);
     }
+
+
 }
 
 void MainWindow::slotDisConnect()
 {
+    MBResult = 255;
+
+    MBTcp -> DisConnect();
+
+    while(MBResult == 255)
+        QApplication::processEvents();
+
+    if (MBResult == 0)
+    {
+        isConnected = false;
+        DisableControl();
+    } else
+    {
+        QMessageBox::critical(this, "TK168", tr("Ошибка отсоединения от TK168"), QMessageBox::Ok);
+    }
 
 }
 
@@ -1157,6 +1519,9 @@ void MainWindow::slotReportSlave()
 
 void MainWindow::slotSelfTest1()
 {
+
+    CHECK_CONNECT();
+
     dSelfTest dialog;
 
     dialog.setPVD1Test(SelfTestConfig[0].PVD1);
@@ -1197,6 +1562,9 @@ void MainWindow::slotSelfTest1()
 
 void MainWindow::slotSelfTest2()
 {
+
+    CHECK_CONNECT();
+
     dSelfTest dialog;
 
     dialog.setPVD1Test(SelfTestConfig[1].PVD1);
@@ -1236,6 +1604,7 @@ void MainWindow::slotSelfTest2()
 void MainWindow::changeBDDLK1(int val)
 {
 
+    CHECK_CONNECT();
 
     ChangeRegimMSS(1, val, 0, 0, 0);
     setCurrentRegimMSS1BDD(val);
@@ -1248,6 +1617,9 @@ void MainWindow::changeBDDLK1(int val)
 void MainWindow::changeBDDLK2(int val)
 {
 
+
+    CHECK_CONNECT();
+
     ChangeRegimMSS(1, 0, val, 0, 0);
     setCurrentRegimMSS2BDD(val);
 
@@ -1258,6 +1630,8 @@ void MainWindow::changeBDDLK2(int val)
 void MainWindow::changeBDDLK3(int val)
 {
 
+    CHECK_CONNECT();
+
     ChangeRegimMSS(1, 0, 0, val, 0);
     setCurrentRegimMSS3BDD(val);
 
@@ -1266,6 +1640,8 @@ void MainWindow::changeBDDLK3(int val)
 
 void MainWindow::changeBDDLK4(int val)
 {
+
+    CHECK_CONNECT();
 
     ChangeRegimMSS(1, 0, 0, 0, val);
     setCurrentRegimMSS4BDD(val);
@@ -1277,6 +1653,7 @@ void MainWindow::changeBDDLK4(int val)
 void MainWindow::changeBDGLK1(int val)
 {
 
+    CHECK_CONNECT();
 
     ChangeRegimMSS(0, val, 0, 0, 0);
     setCurrentRegimMSS1BDG(val);
@@ -1286,6 +1663,8 @@ void MainWindow::changeBDGLK1(int val)
 void MainWindow::changeBDGLK2(int val)
 {
 
+    CHECK_CONNECT();
+
     ChangeRegimMSS(0, 0, val, 0, 0);
     setCurrentRegimMSS2BDG(val);
 
@@ -1293,6 +1672,8 @@ void MainWindow::changeBDGLK2(int val)
 
 void MainWindow::changeBDGLK3(int val)
 {
+
+    CHECK_CONNECT();
 
     ChangeRegimMSS(0, 0, 0, val, 0);
     setCurrentRegimMSS3BDG(val);
@@ -1303,6 +1684,8 @@ void MainWindow::changeBDGLK3(int val)
 void MainWindow::changeBDGLK4(int val)
 {
 
+    CHECK_CONNECT();
+
     ChangeRegimMSS(0, 0, 0, 0, val);
     setCurrentRegimMSS4BDG(val);
 
@@ -1310,6 +1693,8 @@ void MainWindow::changeBDGLK4(int val)
 
 void MainWindow::ManualLoadMSS()
 {
+
+        CHECK_CONNECT();
 
     qDebug() << Q_FUNC_INFO;
 
@@ -1325,7 +1710,7 @@ void MainWindow::ManualLoadMSS()
 void MainWindow::slotSetRegimeSoft(int num)
 {
 
-
+  //  CHECK_CONNECT();
 
     qDebug() << "Ops!!" << num;
 
@@ -1339,6 +1724,9 @@ void MainWindow::slotSetRegimeSoft(int num)
 
 
     CurrentSoftRegimeNumber = num;
+
+    ReadRegimSettings(num);
+
 }
 
 void MainWindow::slotReadPVD(bool osn, quint16 numBD, quint16 numMSS)
@@ -1724,7 +2112,7 @@ void MainWindow::slotSetSyncTack(quint8 tack)
     case 2:
         data[0] = 0;
         data[1] = 1;
-        berak;
+        break;
 
     case 3:
         data[0] = 1;

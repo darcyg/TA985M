@@ -11,6 +11,9 @@
 #define WAIT_TIME_FOR_SET_PVD               4
 #define WAIT_TIME_FOR_GET_PVD_TEST          4
 
+#define WAIT_TIME_FOR_SET_MAG               4
+#define WAIT_TIME_FOR_GET_MAG_TEST          4
+
 #define WAIT_TIME_FOR_SET_MSS               4
 #define WAIT_TIME_FOR_GET_MSS_TEST          4
 
@@ -60,6 +63,8 @@ private:
     bool MSS3_Result;
     bool MSS4_Result;
 
+    bool MAG_Result[16];
+
     bool ALL_Result;
 
     CHECK_STAGE CheckStage;
@@ -108,19 +113,26 @@ public slots:
     void OnTimeOut();
 
     void slotChangePVDStatusOK();
+    void slotChangeMAGStatusOK();
     void slotChangeMSSSelfTestSetOK();
     void slotModBusError(quint8 error);
 
     void slotPVDTestResult(bool All, bool PVD_A, bool PVD_B, bool PVD_V, bool PVD_G, bool PVD_D);
+    void slotMAGTestResult(bool All, bool *data);
+
+
     void slotMSSTestResult(bool All, bool ch1, bool ch2, bool ch3, bool ch4);
+
 
 signals:
 
     void setPVDStatus(bool osn, quint8 status);
     void getPVDTestResult(bool osn);
+    void setMAGStatus(quint8 status);
 
     void setMSSSelfTest(quint8 num, bool ch1, bool ch2, bool ch3, bool ch4);
     void getMSSTestResult(quint8 num);
+    void getMAGTestResult();
 };
 
 #endif // DSELFTEST_H

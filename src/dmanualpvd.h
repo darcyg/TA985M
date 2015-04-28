@@ -9,9 +9,9 @@
 
 #include "src/dsdatamodel.h"
 
+quint16 const pSizeFromRegime[4] = {256, 64, 64, 64};
+quint16 const pAddrFromRegime[4] = {0, 64, 128, 192};
 
-quint16 const SizeFromRegime[4] = {256, 64, 64, 64};
-quint16 const AddrFromRegime[4] = {0, 64, 128, 192};
 
 class dManualPVD : public QDialog, private Ui::dManualPVD
 {
@@ -20,6 +20,8 @@ class dManualPVD : public QDialog, private Ui::dManualPVD
 
 
 private:
+
+
 
     bool noRead;
     bool ReadError;
@@ -64,7 +66,7 @@ public slots:
 
 signals:
 
-    void getPVDData(quint16 numBD, quint16 numMSS);
+    void getPVDData(bool osn, quint16 numBD, quint16 numMSS);
     void OnOffPVD(bool OSN, quint8 PVD_A, quint8 PVD_B, quint8 PVD_V, quint8 PVD_G, quint8 PVD_D);
     void ChangePVDStatus(bool osn, quint8 status);
     void GetTest(bool osn);
