@@ -598,6 +598,20 @@ void MainWindow::ReadRegimSettings(int regim)
 
      regimSettingsFile.endGroup();
 
+
+     regimSettingsFile.beginGroup("BD_Address");
+
+     BD_ADDR[3] = regimSettingsFile.value("BD_G", -1).toInt();
+     BD_ADDR[4] = regimSettingsFile.value("BD_D", -1).toInt();
+
+     MAG_ADDR[0] = regimSettingsFile.value("MAG_A", -1).toInt();
+     MAG_ADDR[1] = regimSettingsFile.value("MAG_B", -1).toInt();
+     MAG_ADDR[2] = regimSettingsFile.value("MAG_V", -1).toInt();
+     MAG_ADDR[3] = regimSettingsFile.value("MAG_G", -1).toInt();
+     MAG_ADDR[4] = regimSettingsFile.value("MAG_D", -1).toInt();
+
+     regimSettingsFile.endGroup();
+
      regimSettingsFile.beginGroup("Control");
 
      ControlEnable.BDG_LK1 = regimSettingsFile.value("BDG_LK1_EN", true).toBool();
@@ -645,6 +659,18 @@ void MainWindow::ReadRegimSettings(int regim)
 
     regimSettingsFile.endGroup();
 
+
+    MAGA_ADDR -> setValue(MAG_ADDR[0]);
+    MAGB_ADDR -> setValue(MAG_ADDR[1]);
+    MAGV_ADDR -> setValue(MAG_ADDR[2]);
+    MAGG_ADDR -> setValue(MAG_ADDR[3]);
+    MAGD_ADDR -> setValue(MAG_ADDR[4]);
+
+    BDA_ADDR -> setText(QString::number(BD_ADDR[0]));
+    BDB_ADDR -> setText(QString::number(BD_ADDR[1]));
+    BDV_ADDR -> setText(QString::number(BD_ADDR[2]));
+    BDG_ADDR -> setValue(BD_ADDR[3]);
+    BDD_ADDR -> setValue(BD_ADDR[4]);
 
     lMSS1_A -> setText(MSSFileName[0][currentRegim[0][0]]);
     lMSS2_A -> setText(MSSFileName[0][currentRegim[1][0]]);
@@ -1185,133 +1211,11 @@ void MainWindow::slotStartCheck()
 
 void MainWindow::slotCheckPVD()
 {
-    ViewBD view;
-
-    quint8 currRegim[2][4];
-    quint8 currDevice = 0;
-    quint8 currMSS = 0;
-
-    quint8 RegimForCheck[4] = {1, 1, 1, 1};
-
-    bool check;
-    bool BDFirstCheck;
 
 
-// Загрузка МСС
-//    for (int i = 0; i < 3; i++)
-//    {
-//        slotLoadMSS(i, MSSFile[currentRegim[0][i]] -> currentIndex(), MSSFile[currentRegim[1][i]] -> currentIndex(),
-//                       MSSFile[currentRegim[2][i]] -> currentIndex(), MSSFile[currentRegim[3][i]] -> currentIndex());
-//    }
+    dCheckPVD dialog;
 
-//// Установка режимов
-
-//    for (int i = 0; i < 2; i++)
-//    {
-//        for (int j = 0; j < 4; j++)
-//        {
-//            if (currentRegim[j][i + 3])
-//            {
-//                currRegim[i][j] = currentRegim[j][i + 3];
-//            } else
-//            {
-//                currRegim[i][j] = 1;
-//            }
-//        }
-//    }
-
-
-    if (cbAllCheck -> isChecked())
-    {
-        currDevice = 0;
-    } else
-    {
-        currDevice = tabWidget->currentIndex();
-    }
-
-    qDebug() << " currDevice: " << currDevice;
-
-
-    currMSS = 0;
-
-    check = true;
-    BDFirstCheck = true;
-
-    while (check)
-    {
-
-
-
-       if (BDFirstCheck) // Если первая проверка текущего БД
-       {
-          // Заполняем текущий режим проверки либо значением, либо 1 режим при пееборе
-          for (int i = 0; i < 4; i++)
-          {
-              if (currentRegim[i][currDevice] == 0)
-                  RegimForCheck[i] = 1;
-              else
-                  RegimForCheck[i] = currentRegim[i][currDevice];
-          }
-
-        } else
-          {
-            // Иначе увеличиваем режим, если для него выбран перебор
-            for (int i = 0; i < 4; i++)
-            {
-               if (currentRegim[i][currDevice] == 0)
-                   RegimForCheck[i]++;
-            }
-           }
-
-
-
-        // Загружаем МСС и устанавливаем режим
-
-        slotLoadMSS(currDevice, RegimForCheck[0], RegimForCheck[1], RegimForCheck[2], RegimForCheck[3]);
-        ChangeRegimMSS(currDevice, RegimForCheck[0], RegimForCheck[1], RegimForCheck[2], RegimForCheck[3]);
-
-// !!!!!!!!!!!!! тут должен быть запуск опроса БД и таймер задержки
-
-        // Проверка БД !!!! Надо добавить зацикливание!!!!!!
-
-        for (quint8 currentMSS = 0; currentMSS < 4; currentMSS++) // Пройдемся по всем 4 МСС
-        {
-
-            if (!BDFirstCheck && (currentRegim[currentMSS][currDevice])) // Если не первая проверка БД и нет перебора, то мы его уже проверяли
-                continue;
-
-//            if (LoadMSSPVD(BDData, currDevice, currentMSS, RegimForCheck[currentMSS], MSSFile[0]->currentIndex()))
-//            {
-//                qDebug() << "Ошибка чтения БД";
-//                check = false;
-//                break;
-//            }
-        }
-
-
-        // Закончили проверять БД и делаем переход на другой БД или другой режим
-
-        if (check) // Если нет ошибок
-        {
-
-            if (BDFirstCheck || currentRegim[0][currDevice]
-                    || currentRegim[1][currDevice] || currentRegim[2][currDevice] || currentRegim[3][currDevice])
-            {
-
-            }
-
-            if (cbAllCheck->isChecked()) // Если все проверяем
-            {
-                currDevice++;
-                if (currDevice == 5) // Типа все проверили
-                {
-                    qDebug() << "Ошибок не обнаруженно";
-                    check = false;
-                }
-            }
-        }
-
-    }
+    dialog.exec();
 
 }
 

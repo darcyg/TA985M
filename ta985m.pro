@@ -25,7 +25,9 @@ SOURCES += main.cpp\
     src/dmanualpvd.cpp \
     src/dsdatamodel.cpp \
     src/dmanuamag.cpp \
-    src/dselftest.cpp
+    src/dselftest.cpp \
+    src/dmanualkommss.cpp \
+    src/dcheckpvd.cpp
 
 HEADERS  += mainwindow.h \
             src/ta985m.h \
@@ -45,7 +47,9 @@ HEADERS  += mainwindow.h \
     src/dmanualpvd.h \
     src/dsdatamodel.h \
     src/dmanuamag.h \
-    src/dselftest.h
+    src/dselftest.h \
+    src/dmanualkommss.h \
+    src/dcheckpvd.h
 
 FORMS    += mainwindow.ui \
     src/viewbd.ui \
@@ -53,7 +57,13 @@ FORMS    += mainwindow.ui \
     src/dmssfileset.ui \
     src/dmanualpvd.ui \
     src/dmanuamag.ui \
-    src/dselftest.ui
+    src/dselftest.ui \
+    src/dmanualkommss.ui \
+    src/dcheckpvd.ui
 
 
 INCLUDEPATH += 3rdparty/libmodbus
+
+
+win32:DEFINES += _TTY_WIN_  WINVER=0x0501
+win32:LIBS += -lsetupapi -lwsock32 -lws2_32

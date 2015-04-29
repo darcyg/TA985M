@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>3</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab">
      <attribute name="title">
@@ -38,7 +38,7 @@
        <rect>
         <x>190</x>
         <y>30</y>
-        <width>271</width>
+        <width>326</width>
         <height>61</height>
        </rect>
       </property>
@@ -65,7 +65,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="MAGA_ADDR"/>
+        <widget class="QSpinBox" name="MAGA_ADDR">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="BDA_ADDR">
@@ -175,7 +179,7 @@
          <x>0</x>
          <y>20</y>
          <width>191</width>
-         <height>121</height>
+         <height>140</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -383,7 +387,7 @@
          <x>0</x>
          <y>20</y>
          <width>191</width>
-         <height>121</height>
+         <height>140</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
@@ -492,7 +496,7 @@
        <rect>
         <x>190</x>
         <y>30</y>
-        <width>271</width>
+        <width>326</width>
         <height>61</height>
        </rect>
       </property>
@@ -519,7 +523,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="MAGB_ADDR"/>
+        <widget class="QSpinBox" name="MAGB_ADDR">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="BDB_ADDR">
@@ -634,7 +642,7 @@
          <x>0</x>
          <y>20</y>
          <width>191</width>
-         <height>121</height>
+         <height>140</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -741,9 +749,9 @@
      <widget class="QWidget" name="gridLayoutWidget_9">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>180</x>
         <y>30</y>
-        <width>271</width>
+        <width>281</width>
         <height>61</height>
        </rect>
       </property>
@@ -770,7 +778,11 @@
         </widget>
        </item>
        <item row="1" column="1">
-        <widget class="QSpinBox" name="MAGV_ADDR"/>
+        <widget class="QSpinBox" name="MAGV_ADDR">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="1">
         <widget class="QLabel" name="BDV_ADDR">
@@ -789,15 +801,19 @@
      <widget class="QWidget" name="gridLayoutWidget_4">
       <property name="geometry">
        <rect>
-        <x>190</x>
+        <x>180</x>
         <y>30</y>
-        <width>271</width>
-        <height>61</height>
+        <width>281</width>
+        <height>70</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_4">
        <item row="1" column="1">
-        <widget class="QSpinBox" name="MAGG_ADDR"/>
+        <widget class="QSpinBox" name="MAGG_ADDR">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+        </widget>
        </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label_14">
@@ -814,7 +830,11 @@
         </widget>
        </item>
        <item row="0" column="1">
-        <widget class="QSpinBox" name="BDG_ADDR"/>
+        <widget class="QSpinBox" name="BDG_ADDR">
+         <property name="minimum">
+          <number>-1</number>
+         </property>
+        </widget>
        </item>
        <item row="0" column="2">
         <widget class="QPushButton" name="pbMAGAddrOnMAGG">
@@ -850,7 +870,7 @@
          <x>10</x>
          <y>20</y>
          <width>151</width>
-         <height>112</height>
+         <height>144</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
@@ -1011,7 +1031,7 @@
          <x>0</x>
          <y>20</y>
          <width>191</width>
-         <height>121</height>
+         <height>140</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout">
@@ -1138,7 +1158,7 @@
          <x>10</x>
          <y>20</y>
          <width>151</width>
-         <height>112</height>
+         <height>144</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout">
@@ -1286,8 +1306,8 @@
        <rect>
         <x>190</x>
         <y>30</y>
-        <width>271</width>
-        <height>61</height>
+        <width>310</width>
+        <height>70</height>
        </rect>
       </property>
       <layout class="QGridLayout" name="gridLayout_2">
@@ -1353,7 +1373,7 @@
          <x>0</x>
          <y>20</y>
          <width>191</width>
-         <height>121</height>
+         <height>140</height>
         </rect>
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -1547,7 +1567,7 @@
       <rect>
        <x>9</x>
        <y>30</y>
-       <width>651</width>
+       <width>701</width>
        <height>51</height>
       </rect>
      </property>
@@ -1717,7 +1737,7 @@
        <x>0</x>
        <y>20</y>
        <width>671</width>
-       <height>31</height>
+       <height>33</height>
       </rect>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -2094,7 +2114,7 @@
      <x>0</x>
      <y>0</y>
      <width>694</width>
-     <height>20</height>
+     <height>29</height>
     </rect>
    </property>
    <widget class="QMenu" name="mWorkRegim">

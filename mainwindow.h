@@ -25,8 +25,12 @@
 #include "src/dmanualpvd.h"
 #include "src/dmanuamag.h"
 #include "src/dmanualkommss.h"
+#include "src/dcheckpvd.h"
+
 
 #include "src/ta985m.h"
+
+
 
 
 static const char * msgType[] =
@@ -92,6 +96,8 @@ private:
     bool SelfTestControl;
 
     quint8 currentRegim[4][5];
+    qint8 MAG_ADDR[5];
+    qint8 BD_ADDR[5];
 
     void MSSLoad(quint8 bd_num, quint8 regim1, quint8 regim2, quint8 regim3, quint8 regim4);
 
