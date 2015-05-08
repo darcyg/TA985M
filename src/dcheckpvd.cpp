@@ -9,37 +9,42 @@ void dCheckPVD::CreateStateMashine()
     TopState = new QState;
 
 
-    WaitStart = new QState(TopState);
-    Start = new QState(TopState);
-    LoadMSS = new QState(TopState);
+    sWaitStart = new QState(TopState);
+    sStart = new QState(TopState);
+    sLoadMSS = new QState(TopState);
 
 
     FinalState = new QFinalState;
 
 
-    WaitStart -> addTransition(pbStart, SIGNAL(clicked()), Start);
+    sWaitStart -> addTransition(pbStart, SIGNAL(clicked()), sStart);
 
 
-    WaitStart -> assignProperty(label, "text", "WaitStart");
-    WaitStart -> assignProperty(pbStart, "enabled", true);
-    WaitStart -> assignProperty(pbStop, "enabled", false);
+    sWaitStart -> assignProperty(label, "text", "WaitStart");
+    sWaitStart -> assignProperty(pbStart, "enabled", true);
+    sWaitStart -> assignProperty(pbStop, "enabled", false);
 
 
-    Start -> assignProperty(label, "text", "Start");
-    Start -> assignProperty(pbStart, "enabled", false);
-    Start -> assignProperty(pbStop, "enabled", true);
+    sStart -> assignProperty(label, "text", "Start");
+    sStart -> assignProperty(pbStart, "enabled", false);
+    sStart -> assignProperty(pbStop, "enabled", true);
+
+    sStart -> assignProperty(this, "currBD_Number", 1);
 
 
 
 
-    connect(Start, SIGNAL(entered()), this, SLOT(slotTest1()));
+    connect(sStart, SIGNAL(entered()), this, SLOT(slotTest1()));
+
+    connect(FinalState, SIGNAL(entered()), this, SLOT(slotStopChecking()));
+
 
     TopState -> addTransition(pbStop, SIGNAL(clicked()), FinalState);
 
     mashine -> addState(TopState);
     mashine -> addState(FinalState);
 
-    TopState -> setInitialState(WaitStart);
+    TopState -> setInitialState(sWaitStart);
     mashine -> setInitialState(TopState);
 
 
@@ -70,4 +75,32 @@ void dCheckPVD::slotTest1()
 void dCheckPVD::timeOut()
 {
     //if (!mashine -> isRunning()) label -> setText("Stop"); else label -> setText("Start");
+}
+
+void dCheckPVD::slotStopChecking()
+{
+
+    QMessageBox::warning(this, "Stop", "Stop checking", QMessageBox::Ok);
+
+    pbStart -> setEnabled(true);
+    pbStop -> setDisabled(true);
+    pbClose -> setEnabled(true);
+
+
+}
+
+void dCheckPVD::setCurrBD_Number(quint8 val)
+{
+
+    qDebug() << Q_FUNC_INFO << val;
+
+}
+
+void dCheckPVD::setLoadMSS(bool flag)
+{
+    if (flag)
+    {
+
+    }
+
 }

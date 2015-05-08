@@ -19,6 +19,9 @@ class dCheckPVD : public QDialog, private Ui::dCheckPVD
 private:
 
 
+    Q_PROPERTY(quint8 currBD_Number READ currBDNum WRITE setCurrBD_Number)
+    Q_PROPERTY(bool  LoadMSS READ LoadMSS WRITE setLoadMSS )
+
     QTimer *timer;
 
     QStateMachine *mashine;
@@ -26,15 +29,22 @@ private:
     QState *TopState;           // Верхнее состояние, чтобы организовать выход
 
 
-    QState *WaitStart;          // Начальное состояние перед стартом
-    QState *Start;              // Запуск проверки
-    QState *LoadMSS;            // Загрузка иммитаторов МСС
+    QState *sWaitStart;          // Начальное состояние перед стартом
+    QState *sStart;              // Запуск проверки
+    QState *sLoadMSS;            // Загрузка иммитаторов МСС
 
     QFinalState *FinalState;    // Окончание проверки
 
+    quint8 m_currBDNum;         // Текущий проверяемы БД
+    bool m_LoadMSS;             // Флаг загрузки имитатора МСС
 
 
-void CreateStateMashine();
+    void CreateStateMashine();
+
+    quint8 currBDNum() {return m_currBDNum;}
+    bool LoadMSS() {return m_LoadMSS;}
+
+
 
 
 public:
@@ -48,6 +58,9 @@ public slots:
 
 
     void slotStopChecking();
+    void setCurrBD_Number(quint8 val);
+    void setLoadMSS(bool flag);
+
 };
 
 #endif // DCHECKPVD_H
